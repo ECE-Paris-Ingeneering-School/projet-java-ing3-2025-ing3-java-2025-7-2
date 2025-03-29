@@ -1,0 +1,127 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.0
+-- https://www.phpmyadmin.net/
+--
+-- Hôte : 127.0.0.1:3308
+-- Généré le : sam. 29 mars 2025 à 21:55
+-- Version du serveur : 8.0.31
+-- Version de PHP : 8.0.26
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de données : `attraction`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `admin`
+--
+
+DROP TABLE IF EXISTS `admin`;
+CREATE TABLE IF NOT EXISTS `admin` (
+  `idAdmin` int NOT NULL AUTO_INCREMENT,
+  `mail` varchar(100) NOT NULL,
+  `motDePasse` varchar(20) NOT NULL,
+  `nom` varchar(50) DEFAULT NULL,
+  `prenom` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`idAdmin`),
+  UNIQUE KEY `mail` (`mail`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `attraction`
+--
+
+DROP TABLE IF EXISTS `attraction`;
+CREATE TABLE IF NOT EXISTS `attraction` (
+  `idAttraction` int NOT NULL AUTO_INCREMENT,
+  `nom` varchar(100) NOT NULL,
+  `prix` decimal(10,2) NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`idAttraction`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `client`
+--
+
+DROP TABLE IF EXISTS `client`;
+CREATE TABLE IF NOT EXISTS `client` (
+  `idClient` int NOT NULL AUTO_INCREMENT,
+  `mail` varchar(100) NOT NULL,
+  `motDePasse` varchar(20) NOT NULL,
+  `prenom` varchar(50) DEFAULT NULL,
+  `nom` varchar(50) DEFAULT NULL,
+  `dateDeNaissance` date DEFAULT NULL,
+  PRIMARY KEY (`idClient`),
+  UNIQUE KEY `mail` (`mail`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `evenement`
+--
+
+DROP TABLE IF EXISTS `evenement`;
+CREATE TABLE IF NOT EXISTS `evenement` (
+  `idEvenement` int NOT NULL AUTO_INCREMENT,
+  `nom` varchar(100) NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `supplement` decimal(10,2) DEFAULT NULL,
+  `dateDebut` date DEFAULT NULL,
+  `dateFin` date DEFAULT NULL,
+  PRIMARY KEY (`idEvenement`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `facture`
+--
+
+DROP TABLE IF EXISTS `facture`;
+CREATE TABLE IF NOT EXISTS `facture` (
+  `idFacture` int NOT NULL AUTO_INCREMENT,
+  `idClient` int NOT NULL,
+  `dateFacture` date DEFAULT NULL,
+  PRIMARY KEY (`idFacture`),
+  KEY `idClient` (`idClient`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `reservation`
+--
+
+DROP TABLE IF EXISTS `reservation`;
+CREATE TABLE IF NOT EXISTS `reservation` (
+  `idReservation` int NOT NULL AUTO_INCREMENT,
+  `idClient` int NOT NULL,
+  `idAttraction` int NOT NULL,
+  `dateAttraction` date DEFAULT NULL,
+  `dateReservation` date DEFAULT NULL,
+  PRIMARY KEY (`idReservation`),
+  KEY `idClient` (`idClient`),
+  KEY `idAttraction` (`idAttraction`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
