@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3308
--- Généré le : sam. 29 mars 2025 à 21:55
+-- Généré le : mer. 02 avr. 2025 à 07:57
 -- Version du serveur : 8.0.31
 -- Version de PHP : 8.0.26
 
@@ -36,7 +36,19 @@ CREATE TABLE IF NOT EXISTS `admin` (
   `prenom` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`idAdmin`),
   UNIQUE KEY `mail` (`mail`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `admin`
+--
+
+INSERT INTO `admin` (`idAdmin`, `mail`, `motDePasse`, `nom`, `prenom`) VALUES
+(1, 'amandine.soyez@edu.ece.fr', 'Foxie274', 'Soyez', 'Amandine'),
+(2, 'pacome.golvet@edu.ece.fr', 'Linette', 'Golvet', 'Pacome'),
+(3, 'valentin.knockaert@edu.ece.fr', 'Dean', 'Knockaert', 'Valentin'),
+(4, 'martin.duverneuil@edu.ece.fr', 'motdepasse', 'Duverneuil', 'Martin'),
+(5, 'yossra.hajjaji@edu.ece.fr', 'jadorelejava', 'Hajjaji', 'Yossra'),
+(6, 'steven.spielberg@edu.ece.fr', 'Dino', 'Spielberg', 'Steven');
 
 -- --------------------------------------------------------
 
@@ -69,7 +81,19 @@ CREATE TABLE IF NOT EXISTS `client` (
   `dateDeNaissance` date DEFAULT NULL,
   PRIMARY KEY (`idClient`),
   UNIQUE KEY `mail` (`mail`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `client`
+--
+
+INSERT INTO `client` (`idClient`, `mail`, `motDePasse`, `prenom`, `nom`, `dateDeNaissance`) VALUES
+(1, 'lola.coignard@gmail.com', 'triceratops', 'Lola', 'Coignard', '2003-12-07'),
+(2, 'linette.golvet@gmail.com', 'Meow', 'Linette', 'Golvet', '2006-01-01'),
+(3, 'galaad.soyez@gmail.com', 'Miaou', 'Galaad', 'Soyez', '2017-06-24'),
+(4, 'jensen.ackles@gmail.com', 'castiel', 'Jensen', 'Ackles', '1978-03-01'),
+(5, 'rohr.soyez-golvet@gmail.com', 'iule', 'Rohr', 'Soyez-Golvet', '2024-02-22'),
+(6, 'ian.malcolm@gmail.com', 'chaos', 'Ian', 'Malcolm', '1967-09-21');
 
 -- --------------------------------------------------------
 
