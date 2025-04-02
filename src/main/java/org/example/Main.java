@@ -11,7 +11,8 @@ public class Main {
         frame.getContentPane().setLayout(new FlowLayout());
 
         // Ajouter un "label" au contenu du fenêtre
-        JLabel label = new JLabel("Hello World");
+        JLabel label = new JLabel("" +
+                "" + "test c'est Pacôme");
         frame.getContentPane().add(label);
 
         // Afficher le fenêtre
