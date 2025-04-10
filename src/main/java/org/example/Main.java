@@ -1,4 +1,8 @@
+import Controleur.controleur;
+import Modele.Admin;
+import Modele.modele;
 import javax.swing.*;  import java.awt.*;
+import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {
@@ -11,13 +15,13 @@ public class Main {
         frame.getContentPane().setLayout(new FlowLayout());
 
         // Ajouter un "label" au contenu du fenêtre
-        JLabel label = new JLabel("" +
-                "" + "test c'est Pacôme");
+        JLabel label = new JLabel("Hello World");
         frame.getContentPane().add(label);
 
         // Afficher le fenêtre
         frame.setSize(200,50);
         frame.setVisible(true);
+
     }
 }
 
