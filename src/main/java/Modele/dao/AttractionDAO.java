@@ -37,5 +37,18 @@ public class AttractionDAO {
         }
         return -1;
     }
+
+    public int getIdAttractionParNom(String nom) throws SQLException {
+        String sql = "SELECT idAttraction FROM attraction WHERE nom = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nom);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("idAttraction");
+            } else {
+                throw new SQLException("Attraction non trouvée : " + nom);
+            }
+        }
+    }
 }
 

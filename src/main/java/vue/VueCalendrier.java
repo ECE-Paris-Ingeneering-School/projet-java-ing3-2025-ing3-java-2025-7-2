@@ -3,11 +3,15 @@ package vue;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Date;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import controleur.Calendrier;
-import controleur.Reservation;
+import modele.Utilisateur;
+import modele.dao.AttractionDAO;
+import modele.dao.ConnexionBDD;
+import modele.dao.ReservationDAO;
 
 public class VueCalendrier extends JFrame {
     private Calendrier controller;
@@ -15,25 +19,25 @@ public class VueCalendrier extends JFrame {
     private JPanel calendarPanel;
     private JLabel monthLabel;
     private JPanel reservationPanel;
+    private Utilisateur utilisateurConnecte;
 
-    public VueCalendrier() {
+    public VueCalendrier(Utilisateur utilisateur) {
+        this.utilisateurConnecte = utilisateur;
         this.controller = new Calendrier(this);
         initializeUI();
         controller.initializeCalendar();
     }
 
     private void initializeUI() {
-        setTitle("Calendrier des Réservations");
+        setTitle("Calendrier des Réservations - Connecté : " + utilisateurConnecte.getPrenom());
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Panel du mois
         JPanel monthPanel = new JPanel();
         monthLabel = new JLabel("", JLabel.CENTER);
         monthPanel.add(monthLabel);
 
-        // Boutons navigation
         JButton prevButton = new JButton("<");
         prevButton.addActionListener(e -> navigateMonth(-1));
 
@@ -45,10 +49,8 @@ public class VueCalendrier extends JFrame {
         navPanel.add(monthPanel, BorderLayout.CENTER);
         navPanel.add(nextButton, BorderLayout.EAST);
 
-        // Panel du calendrier
         calendarPanel = new JPanel(new GridLayout(0, 7));
 
-        // Panel de réservation
         reservationPanel = new JPanel();
         reservationPanel.setBorder(BorderFactory.createTitledBorder("Réservation"));
 
@@ -62,21 +64,18 @@ public class VueCalendrier extends JFrame {
         monthLabel.setText(yearMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")));
         calendarPanel.removeAll();
 
-        // En-têtes des jours
         String[] days = {"Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"};
         for (String day : days) {
             calendarPanel.add(new JLabel(day, JLabel.CENTER));
         }
 
         LocalDate firstOfMonth = yearMonth.atDay(1);
-        int dayOfWeek = firstOfMonth.getDayOfWeek().getValue(); // 1 (Lundi) à 7 (Dimanche)
+        int dayOfWeek = firstOfMonth.getDayOfWeek().getValue();
 
-        // Jours vides au début
         for (int i = 1; i < dayOfWeek; i++) {
             calendarPanel.add(new JPanel());
         }
 
-        // Jours du mois
         for (int day = 1; day <= yearMonth.lengthOfMonth(); day++) {
             LocalDate date = yearMonth.atDay(day);
             JButton dayButton = new JButton(String.valueOf(day));
@@ -103,9 +102,25 @@ public class VueCalendrier extends JFrame {
             JButton reserveButton = new JButton("Réserver");
 
             reserveButton.addActionListener(e -> {
+                if ("admin".equalsIgnoreCase(utilisateurConnecte.getRole())) {
+                    JOptionPane.showMessageDialog(this,
+                            "Les administrateurs ne sont pas autorisés à effectuer des réservations.",
+                            "Accès refusé",
+                            JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
                 String selected = (String) attractionCombo.getSelectedItem();
-                new Reservation().addReservation(selected, date, 1); // 1 = client simulé
-                JOptionPane.showMessageDialog(this, "Réservation ajoutée pour " + selected);
+                try {
+                    AttractionDAO attractionDAO = new AttractionDAO(ConnexionBDD.getConnexion());
+                    int idAttraction = attractionDAO.getAttractionIdByName(selected);
+                    ReservationDAO dao = new ReservationDAO(ConnexionBDD.getConnexion());
+                    dao.ajouterReservation(utilisateurConnecte.getId(), idAttraction, Date.valueOf(date));
+                    JOptionPane.showMessageDialog(this, "Réservation ajoutée pour " + selected);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Erreur lors de la réservation.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
             });
 
             reservationPanel.add(new JLabel("Attractions:"));

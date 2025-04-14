@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import modele.Utilisateur;
-import controlleur.AuthentificationService;
+import controleur.AuthentificationService;
 import modele.dao.ConnexionBDD;
 
 import java.sql.Connection;
@@ -63,6 +63,16 @@ public class ConnexionApp extends Application {
                     messageLabel.setText("Connexion réussie !");
                     messageLabel.setTextFill(Color.GREEN);
                     VueUtilisateur.afficherInfos(utilisateur);
+
+                    // 👇 Lancement du calendrier avec l'utilisateur connecté
+                    javafx.application.Platform.runLater(() -> {
+                        primaryStage.close(); // ferme la fenêtre JavaFX
+                        javax.swing.SwingUtilities.invokeLater(() -> {
+                            new VueCalendrier(utilisateur).setVisible(true);
+                        });
+                    });
+
+
                 } else {
                     messageLabel.setText("Identifiants incorrects.");
                     messageLabel.setTextFill(Color.RED);
