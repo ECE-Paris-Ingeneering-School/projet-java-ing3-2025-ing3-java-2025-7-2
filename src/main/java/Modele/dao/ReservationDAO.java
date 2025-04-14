@@ -1,4 +1,4 @@
-package Modele;
+package modele.dao;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class ReservationDAO {
 
 
         /// A AJOUTER DANS LE CONTROLEUR GRAPHIQUE (bouton pr reserver) :
-        ///ReservationDAO dao = new ReservationDAO(ConnexionBDD.getConnection());
-        ///dao.ajouterReservation(idClient, idAttraction, dateChoisie);
+        ///ReservationDAO modele.dao = new ReservationDAO(ConnexionBDD.getConnection());
+        ///modele.dao.ajouterReservation(idClient, idAttraction, dateChoisie);
     }
 }

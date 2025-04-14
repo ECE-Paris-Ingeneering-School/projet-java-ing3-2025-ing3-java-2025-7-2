@@ -9,7 +9,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import modele.Utilisateur;
 import controlleur.AuthentificationService;
-import dao.ConnexionBDD;
+import modele.dao.ConnexionBDD;
 
 import java.sql.Connection;
 

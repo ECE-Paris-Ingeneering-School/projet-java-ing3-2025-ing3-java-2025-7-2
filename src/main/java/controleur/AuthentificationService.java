@@ -1,6 +1,5 @@
 package controlleur;
 
-import dao.ConnexionBDD;
 import modele.Utilisateur;
 
 import java.sql.*;
