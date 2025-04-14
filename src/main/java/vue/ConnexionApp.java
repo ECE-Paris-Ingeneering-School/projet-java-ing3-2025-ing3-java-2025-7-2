@@ -28,7 +28,6 @@ public class ConnexionApp extends Application {
         ImageView logoView = new ImageView(logoImage);
         logoView.setFitHeight(80);
         logoView.setPreserveRatio(true);
-
         HBox logoBox = new HBox(logoView);
         logoBox.setAlignment(Pos.TOP_LEFT);
         logoBox.setPadding(new Insets(10, 0, 0, 10));
@@ -72,6 +71,14 @@ public class ConnexionApp extends Application {
                     messageLabel.setText("Connexion réussie !");
                     messageLabel.setTextFill(Color.GREEN);
                     VueUtilisateur.afficherInfos(utilisateur);
+                    // 👇 Lancement du calendrier avec l'utilisateur connecté
+                    javafx.application.Platform.runLater(() -> {
+                        primaryStage.close(); // ferme la fenêtre JavaFX
+                        javax.swing.SwingUtilities.invokeLater(() -> {
+                            new VueCalendrier(utilisateur).setVisible(true);
+                        });
+                    });
+
                 } else {
                     messageLabel.setText("Identifiants incorrects.");
                     messageLabel.setTextFill(Color.RED);
@@ -83,14 +90,36 @@ public class ConnexionApp extends Application {
             }
         });
 
-        // ===== Layout principal =====
-        VBox root = new VBox(15, logoBox, titreLabel, emailField, passwordField, loginButton, messageLabel);
-        root.setAlignment(Pos.TOP_CENTER); // pour que tout sauf logo soit centré
-        root.setPadding(new Insets(30));
-        root.setPrefSize(350, 550);
-        root.setStyle("-fx-background-color: #ecf0f1;");
+        // ===== Navigation style mobile =====
+        HBox navBar = new HBox(15);
+        navBar.setAlignment(Pos.CENTER);
+        navBar.setPadding(new Insets(15));
+        navBar.setStyle("-fx-background-color: yellow;");
 
-        Scene scene = new Scene(root);
+        // Boutons de navigation
+        Button btnHome = creerBoutonNavigation("🏠");
+        Button btnCalendar = creerBoutonNavigation("📅");
+        Button btnCart = creerBoutonNavigation("🛒");
+        Button btnUser = creerBoutonNavigation("👤");
+
+        navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
+
+        // ===== Contenu central =====
+        VBox contenu = new VBox(15, titreLabel, emailField, passwordField, loginButton, messageLabel);
+        contenu.setAlignment(Pos.CENTER);
+        contenu.setPadding(new Insets(10));
+
+        VBox centerBox = new VBox(logoBox, contenu);
+        VBox.setMargin(logoBox, new Insets(0, 0, 10, 0));
+        centerBox.setAlignment(Pos.TOP_CENTER);
+
+        // ===== Layout principal avec navigation en bas =====
+        BorderPane root = new BorderPane();
+        root.setCenter(centerBox);
+        root.setBottom(navBar);
+        root.setStyle("-fx-background-color: #d0f5c8;"); // fond vert clair
+
+        Scene scene = new Scene(root, 350, 550);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -101,10 +130,25 @@ public class ConnexionApp extends Application {
                         "-fx-border-radius: 10;" +
                         "-fx-padding: 8;" +
                         "-fx-border-color: #bdc3c7;" +
-                        "-fx-border-width: 1px;"
+                        "-fx-border-width: 1px;" +
+                        "-fx-background-color: #ff8f8f;" // fond rose comme dans l'image
         );
         champ.setFont(Font.font("Arial", 14));
         champ.setMaxWidth(250);
+    }
+
+    private Button creerBoutonNavigation(String emoji) {
+        Button btn = new Button(emoji);
+        btn.setStyle(
+                "-fx-background-color: black;" +
+                        "-fx-text-fill: yellow;" +
+                        "-fx-font-size: 18px;" +
+                        "-fx-background-radius: 10;" +
+                        "-fx-min-width: 60px;" +
+                        "-fx-min-height: 60px;" +
+                        "-fx-padding: 10;"
+        );
+        return btn;
     }
 
     public static void main(String[] args) {
