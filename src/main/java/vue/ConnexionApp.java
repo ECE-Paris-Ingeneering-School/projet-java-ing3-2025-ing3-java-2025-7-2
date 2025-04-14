@@ -5,7 +5,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -21,26 +23,33 @@ public class ConnexionApp extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Connexion");
 
-        // Titre
+        // ===== Logo en haut à gauche =====
+        Image logoImage = new Image(getClass().getResource("/images/logo_JP.png").toExternalForm());
+        ImageView logoView = new ImageView(logoImage);
+        logoView.setFitHeight(80);
+        logoView.setPreserveRatio(true);
+
+        HBox logoBox = new HBox(logoView);
+        logoBox.setAlignment(Pos.TOP_LEFT);
+        logoBox.setPadding(new Insets(10, 0, 0, 10));
+
+        // ===== Titre =====
         Label titreLabel = new Label("Bienvenue !");
         titreLabel.setFont(Font.font("Arial", 26));
         titreLabel.setTextFill(Color.web("#2c3e50"));
 
-        // Champ mail
+        // ===== Champs de connexion =====
         TextField emailField = new TextField();
         emailField.setPromptText("Adresse mail");
         styliserChamp(emailField);
 
-        // Champ mot de passe
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Mot de passe");
         styliserChamp(passwordField);
 
-        // Label message
         Label messageLabel = new Label();
         messageLabel.setTextFill(Color.RED);
 
-        // Bouton
         Button loginButton = new Button("Se connecter");
         loginButton.setStyle(
                 "-fx-background-color: #3498db;" +
@@ -63,16 +72,6 @@ public class ConnexionApp extends Application {
                     messageLabel.setText("Connexion réussie !");
                     messageLabel.setTextFill(Color.GREEN);
                     VueUtilisateur.afficherInfos(utilisateur);
-
-                    // 👇 Lancement du calendrier avec l'utilisateur connecté
-                    javafx.application.Platform.runLater(() -> {
-                        primaryStage.close(); // ferme la fenêtre JavaFX
-                        javax.swing.SwingUtilities.invokeLater(() -> {
-                            new VueCalendrier(utilisateur).setVisible(true);
-                        });
-                    });
-
-
                 } else {
                     messageLabel.setText("Identifiants incorrects.");
                     messageLabel.setTextFill(Color.RED);
@@ -84,9 +83,9 @@ public class ConnexionApp extends Application {
             }
         });
 
-        // Layout vertical
-        VBox root = new VBox(15, titreLabel, emailField, passwordField, loginButton, messageLabel);
-        root.setAlignment(Pos.CENTER);
+        // ===== Layout principal =====
+        VBox root = new VBox(15, logoBox, titreLabel, emailField, passwordField, loginButton, messageLabel);
+        root.setAlignment(Pos.TOP_CENTER); // pour que tout sauf logo soit centré
         root.setPadding(new Insets(30));
         root.setPrefSize(350, 550);
         root.setStyle("-fx-background-color: #ecf0f1;");
