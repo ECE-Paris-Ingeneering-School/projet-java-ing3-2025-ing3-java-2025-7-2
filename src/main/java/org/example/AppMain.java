@@ -1,10 +1,10 @@
 package org.example;
 
 import vue.ConnexionApp;
+import javafx.application.Application;
 
 public class AppMain {
     public static void main(String[] args) {
-        ConnexionApp.lancer(); // Appel de la méthode lancer() depuis le main
+        Application.launch(ConnexionApp.class, args);  // Lancement JavaFX propre
     }
 }
-
