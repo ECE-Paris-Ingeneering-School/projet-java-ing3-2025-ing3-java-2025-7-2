@@ -63,5 +63,43 @@ public class ReservationDAO {
         /// A AJOUTER DANS LE CONTROLEUR GRAPHIQUE (bouton pr reserver) :
         ///ReservationDAO modele.dao = new ReservationDAO(ConnexionBDD.getConnection());
         ///modele.dao.ajouterReservation(idClient, idAttraction, dateChoisie);
+
+
     }
+
+    public List<String> getReservationsDetailsParClientEtDate(int idClient, Date dateReservation) throws SQLException {
+        List<String> reservations = new ArrayList<>();
+        String sql = "SELECT r.idReservation, a.nom, r.dateAttraction, r.dateReservation " +
+                "FROM reservation r " +
+                "JOIN attraction a ON r.idAttraction = a.idAttraction " +
+                "WHERE r.idClient = ? AND r.dateReservation = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idClient);
+            stmt.setDate(2, dateReservation);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String ligne = "Réservation #" + rs.getInt("idReservation") +
+                        " - Attraction : " + rs.getString("nom") +
+                        " - Date Attraction : " + rs.getDate("dateAttraction") +
+                        " - Réservée le : " + rs.getDate("dateReservation");
+                reservations.add(ligne);
+            }
+        }
+        return reservations;
+    }
+
+
+    public void creerFacture(int idClient) throws SQLException {
+        String sql = "INSERT INTO facture (idClient, dateFacture) VALUES (?, CURDATE())";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idClient);
+            stmt.executeUpdate();
+        }
+    }
+
+
+
+
+
+
 }

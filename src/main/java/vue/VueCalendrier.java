@@ -34,6 +34,7 @@ public class VueCalendrier extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        // Navigation mois
         JPanel monthPanel = new JPanel();
         monthLabel = new JLabel("", JLabel.CENTER);
         monthPanel.add(monthLabel);
@@ -49,14 +50,24 @@ public class VueCalendrier extends JFrame {
         navPanel.add(monthPanel, BorderLayout.CENTER);
         navPanel.add(nextButton, BorderLayout.EAST);
 
+        // Panel du calendrier
         calendarPanel = new JPanel(new GridLayout(0, 7));
 
+        // Panel de droite : réservation
         reservationPanel = new JPanel();
         reservationPanel.setBorder(BorderFactory.createTitledBorder("Réservation"));
 
+        // Panel permanent pour le bouton en bas
+        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton recapBtn = new JButton("Voir mes réservations");
+        recapBtn.addActionListener(e -> new VueReservations(utilisateurConnecte).setVisible(true));
+        footerPanel.add(recapBtn);
+
+        // Ajout des panels dans la frame
         add(navPanel, BorderLayout.NORTH);
         add(new JScrollPane(calendarPanel), BorderLayout.CENTER);
-        add(reservationPanel, BorderLayout.SOUTH);
+        add(reservationPanel, BorderLayout.EAST);
+        add(footerPanel, BorderLayout.SOUTH);
     }
 
     public void displayMonth(YearMonth yearMonth) {
