@@ -1,8 +1,9 @@
-import Controleur.controleur;
-import Modele.Admin;
-import Modele.modele;
+import controleur.controleur;
+import modele.Admin;
+import modele.modele;
 import javax.swing.*;  import java.awt.*;
 import java.util.ArrayList;
+
 
 public class Main {
     public static void main(String[] args) {

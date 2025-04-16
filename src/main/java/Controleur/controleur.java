@@ -1,7 +1,7 @@
-package Controleur;
+package controleur;
 
-import Modele.Admin;
-import Modele.modele;
+import modele.*;
+import modele.modele;
 import java.util.*;
 
 public class controleur {
