@@ -17,7 +17,7 @@ import modele.dao.ConnexionBDD;
 
 import java.sql.Connection;
 
-public class ConnexionApp extends Application {
+public class vueConnexion extends Application {
 
     @Override
     public void start(Stage primaryStage) {
