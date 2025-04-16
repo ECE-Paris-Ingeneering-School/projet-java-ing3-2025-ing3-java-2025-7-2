@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3308
--- Généré le : jeu. 10 avr. 2025 à 09:37
+-- Généré le : lun. 14 avr. 2025 à 15:04
 -- Version du serveur : 8.0.31
 -- Version de PHP : 8.0.26
 
@@ -147,9 +147,10 @@ CREATE TABLE IF NOT EXISTS `facture` (
   `idFacture` int NOT NULL AUTO_INCREMENT,
   `idClient` int NOT NULL,
   `dateFacture` date DEFAULT NULL,
+  `prix` double DEFAULT NULL,
   PRIMARY KEY (`idFacture`),
   KEY `idClient` (`idClient`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -164,10 +165,22 @@ CREATE TABLE IF NOT EXISTS `reservation` (
   `idAttraction` int NOT NULL,
   `dateAttraction` date DEFAULT NULL,
   `dateReservation` date DEFAULT NULL,
+  `idFacture` int DEFAULT '0',
   PRIMARY KEY (`idReservation`),
   KEY `idClient` (`idClient`),
   KEY `idAttraction` (`idAttraction`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `reservation`
+--
+
+INSERT INTO `reservation` (`idReservation`, `idClient`, `idAttraction`, `dateAttraction`, `dateReservation`, `idFacture`) VALUES
+(2, 1, 5, '2025-04-03', '2025-04-14', 0),
+(3, 1, 3, '2025-04-11', '2025-04-14', 0),
+(4, 1, 4, '2025-04-04', '2025-04-14', 0),
+(5, 1, 1, '2025-04-14', '2025-04-14', 0),
+(6, 1, 1, '2025-04-04', '2025-04-14', 0);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
