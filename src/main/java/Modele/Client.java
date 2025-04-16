@@ -43,7 +43,7 @@ public class Client {
 
     @Override
     public String toString() {
-        return nom + " " + prenom + " (" + mail + ")";
+        return "id_client : " + id+" || "+ nom + " " + prenom + " (" + mail + ")";
     }
 
     /*public int getAge{
