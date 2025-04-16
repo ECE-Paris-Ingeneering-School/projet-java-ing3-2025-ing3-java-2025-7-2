@@ -70,7 +70,7 @@ public class vueConnexion extends Application {
                 if (utilisateur != null) {
                     messageLabel.setText("Connexion réussie !");
                     messageLabel.setTextFill(Color.GREEN);
-                    VueUtilisateur.afficherInfos(utilisateur);
+                    VueUtilisateur.afficherInfos(utilisateur, conn);
                     // 👇 Lancement du calendrier avec l'utilisateur connecté
                     javafx.application.Platform.runLater(() -> {
                         primaryStage.close(); // ferme la fenêtre JavaFX
