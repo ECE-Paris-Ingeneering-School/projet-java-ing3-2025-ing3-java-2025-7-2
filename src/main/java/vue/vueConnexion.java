@@ -17,6 +17,9 @@ import modele.dao.ConnexionBDD;
 
 import java.sql.Connection;
 
+
+//vueCo FX
+
 public class vueConnexion extends Application {
 
     @Override

@@ -10,6 +10,8 @@ import modele.dao.AttractionDAO;
 import modele.dao.ConnexionBDD;
 import vue.VueCalendrier;
 
+//constructeur compatible
+
 public class Calendrier {
     private VueCalendrier view;
     private AttractionDAO attractionDAO;
