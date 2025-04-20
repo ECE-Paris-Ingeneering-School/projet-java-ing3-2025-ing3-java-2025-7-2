@@ -71,9 +71,12 @@ public class vueConnexion extends Application {
                     messageLabel.setText("Connexion réussie !");
                     messageLabel.setTextFill(Color.GREEN);
 
+                    ConnexionBDD connexion = new ConnexionBDD();
+                    VueUtilisateur.afficher(primaryStage, connexion, utilisateur);
+                    /*
                     // Changer de scène vers le calendrier JavaFX
                     VueCalendrier vueCalendrier = new VueCalendrier(utilisateur);
-                    vueCalendrier.afficher(primaryStage);
+                    vueCalendrier.afficher(primaryStage);*/
 
                 } else {
                     messageLabel.setText("Identifiants incorrects.");
