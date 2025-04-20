@@ -1,129 +1,160 @@
 package vue;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 import modele.Utilisateur;
 import modele.dao.ConnexionBDD;
 import modele.dao.ReservationDAO;
 
-import javax.swing.*;
-import java.awt.*;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-public class VueReservations extends JFrame {
+// ... imports inchangés
+
+public class VueReservations {
 
     private Utilisateur utilisateur;
-    private JPanel panel;
+    private VBox contentBox;
 
-    public VueReservations(Utilisateur utilisateur) {
-        this.utilisateur = utilisateur;
-        setTitle("Mes Réservations et Facture");
-        setSize(600, 500);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
-
-        panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        afficherReservations();
-
-        JScrollPane scroll = new JScrollPane(panel);
-        add(scroll, BorderLayout.CENTER);
-    }
-
-    private void afficherReservations() {
-        panel.removeAll(); // Nettoyer
-        Date today = Date.valueOf(LocalDate.now());
+    private void afficherFacture(int idFacture) {
+        contentBox.getChildren().clear();
 
         try {
             ReservationDAO dao = new ReservationDAO(ConnexionBDD.getConnexion());
+            Map<String, Object> factureInfo = dao.getFactureDetailsAvecReservations(idFacture);
+
+            Label titre = new Label("🧾 Facture #" + idFacture);
+            titre.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+            titre.setTextFill(Color.web("#2c3e50"));
+            titre.setAlignment(Pos.CENTER);
+            titre.setPadding(new Insets(10));
+            titre.setMaxWidth(Double.MAX_VALUE);
+            VBox.setMargin(titre, new Insets(10, 0, 10, 0));
+            contentBox.getChildren().add(titre);
+
+            Label dateLabel = new Label("Date de facture : " + factureInfo.get("date"));
+            Label nbLabel = new Label("Nombre de réservations : " + factureInfo.get("nb"));
+            Label totalLabel = new Label("Prix total : " + factureInfo.get("total") + " €");
+
+            List<Label> details = List.of(dateLabel, nbLabel, totalLabel);
+            for (Label lbl : details) {
+                lbl.setFont(Font.font("Arial", 14));
+                lbl.setTextFill(Color.BLACK);
+                contentBox.getChildren().add(lbl);
+            }
+
+            contentBox.getChildren().add(new Label(""));
+
+            Label sousTitre = new Label("Détail des réservations :");
+            sousTitre.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+            sousTitre.setTextFill(Color.DARKGREEN);
+            contentBox.getChildren().add(sousTitre);
+
+            @SuppressWarnings("unchecked")
+            List<String> lignes = (List<String>) factureInfo.get("reservations");
+
+            for (String ligne : lignes) {
+                Label ligneLabel = new Label("• " + ligne);
+                ligneLabel.setFont(Font.font("Arial", 13));
+                ligneLabel.setWrapText(true);
+                contentBox.getChildren().add(ligneLabel);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Label erreur = new Label("Erreur lors de l'affichage de la facture.");
+            erreur.setTextFill(Color.RED);
+            contentBox.getChildren().add(erreur);
+        }
+    }
+
+    public VueReservations(Utilisateur utilisateur) {
+        this.utilisateur = utilisateur;
+    }
+
+    public void afficher(Stage stage) {
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(15));
+        contentBox = new VBox(10);
+        root.getChildren().add(contentBox);
+
+        try {
+            ReservationDAO dao = new ReservationDAO(ConnexionBDD.getConnexion());
+            Date today = Date.valueOf(LocalDate.now());
             List<String> reservations = dao.getReservationsDetailsParClientEtDate(utilisateur.getId(), today);
 
-            JLabel titre = new JLabel("Réservations non facturées du " + today + " :");
-            titre.setAlignmentX(Component.CENTER_ALIGNMENT);
-            titre.setFont(new Font("Arial", Font.BOLD, 14));
-            panel.add(titre);
+            Label titre = new Label("Vos réservations pour aujourd'hui (" + today + ") :");
+            titre.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+            contentBox.getChildren().add(titre);
 
             if (reservations.isEmpty()) {
-                panel.add(new JLabel("Aucune réservation non facturée aujourd'hui."));
+                contentBox.getChildren().add(new Label("Aucune réservation trouvée."));
             } else {
                 for (String res : reservations) {
-                    JPanel ligne = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                    JLabel label = new JLabel(res);
-                    JButton deleteBtn = new JButton("Supprimer");
-                    deleteBtn.addActionListener(e -> {
+                    HBox ligne = new HBox(10);
+                    ligne.setAlignment(Pos.CENTER_LEFT);
+
+                    Label label = new Label(res);
+                    Button deleteBtn = new Button("Supprimer");
+
+                    deleteBtn.setOnAction(e -> {
                         try {
                             int idRes = Integer.parseInt(res.split("#")[1].split(" ")[0]);
                             dao.supprimerReservation(idRes);
-                            JOptionPane.showMessageDialog(this, "Réservation supprimée !");
-                            afficherReservations(); // refresh
+                            showAlert(Alert.AlertType.INFORMATION, "Suppression", "Réservation supprimée.");
+                            stage.close();
+                            this.afficher(new Stage());
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
                     });
-                    ligne.add(label);
-                    ligne.add(deleteBtn);
-                    panel.add(ligne);
+
+                    ligne.getChildren().addAll(label, deleteBtn);
+                    contentBox.getChildren().add(ligne);
                 }
 
-                JButton confirmer = new JButton("Confirmer & Générer Facture");
-                confirmer.setAlignmentX(Component.CENTER_ALIGNMENT);
-                confirmer.addActionListener(e -> {
+                Button confirmer = new Button("Confirmer & Générer Facture");
+                confirmer.setOnAction(e -> {
                     try {
                         int idFacture = dao.creerFacture(utilisateur.getId());
-                        JOptionPane.showMessageDialog(this, "Facture générée !");
-                        afficherFacture(idFacture);
+                        boolean ok = showAlert(Alert.AlertType.INFORMATION, "Facture", "Facture générée avec succès !");
+                        if (ok) {
+                            afficherFacture(idFacture); // ✅ Affichage automatique après confirmation
+                        }
                     } catch (Exception ex) {
                         ex.printStackTrace();
+                        showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la génération.");
                     }
                 });
 
-                panel.add(Box.createVerticalStrut(10));
-                panel.add(confirmer);
+                contentBox.getChildren().add(confirmer);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        panel.revalidate();
-        panel.repaint();
+        Scene scene = new Scene(new ScrollPane(root), 600, 400);
+        stage.setTitle("Réservations - " + utilisateur.getPrenom());
+        stage.setScene(scene);
+        stage.show();
     }
 
-    private void afficherFacture(int idFacture) {
-        panel.removeAll();
-        try {
-            ReservationDAO dao = new ReservationDAO(ConnexionBDD.getConnexion());
-            Map<String, Object> factureInfo = dao.getFactureDetailsAvecReservations(idFacture);
-
-            JLabel titre = new JLabel("🧾 Facture #" + idFacture);
-            titre.setFont(new Font("Arial", Font.BOLD, 18));
-            titre.setAlignmentX(Component.CENTER_ALIGNMENT);
-            panel.add(titre);
-
-            panel.add(Box.createVerticalStrut(10));
-            panel.add(new JLabel("Date de facture : " + factureInfo.get("date")));
-            panel.add(new JLabel("Nombre de réservations : " + factureInfo.get("nb")));
-            panel.add(new JLabel("Prix total : " + factureInfo.get("total") + " €"));
-            panel.add(Box.createVerticalStrut(10));
-
-            panel.add(new JLabel("Détail des réservations :"));
-
-            @SuppressWarnings("unchecked")
-            List<String> lignes = (List<String>) factureInfo.get("reservations");
-
-            for (String ligne : lignes) {
-                panel.add(new JLabel("• " + ligne));
-            }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            panel.add(new JLabel("Erreur lors de l'affichage de la facture."));
-        }
-
-        panel.revalidate();
-        panel.repaint();
+    private boolean showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setHeaderText(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+        return alert.getResult() == ButtonType.OK;
     }
 }
+

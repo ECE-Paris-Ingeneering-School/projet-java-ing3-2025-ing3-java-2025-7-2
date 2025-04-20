@@ -29,8 +29,12 @@ public class ClientDAO {
                 liste_clients.add(c);
             }
 
-        } catch (SQLException | IOException | ClassNotFoundException e) {
-            System.err.println("❌ Erreur lors de la récupération des clients : " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println(" Erreur lors de la récupération des clients : " + e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
         return liste_clients;

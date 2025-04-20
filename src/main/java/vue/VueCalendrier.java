@@ -1,145 +1,183 @@
 package vue;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.sql.Date;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 import controleur.Calendrier;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import modele.Utilisateur;
 import modele.dao.AttractionDAO;
 import modele.dao.ConnexionBDD;
 import modele.dao.ReservationDAO;
 
-public class VueCalendrier extends JFrame {
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.TextStyle;
+import java.util.List;
+import java.util.Locale;
+
+public class VueCalendrier {
+
     private Calendrier controller;
     private YearMonth currentYearMonth;
-    private JPanel calendarPanel;
-    private JLabel monthLabel;
-    private JPanel reservationPanel;
+    private GridPane calendarGrid;
+    private Label monthLabel;
+    private VBox reservationPanel;
     private Utilisateur utilisateurConnecte;
+    private Stage stage;
 
     public VueCalendrier(Utilisateur utilisateur) {
         this.utilisateurConnecte = utilisateur;
         this.controller = new Calendrier(this);
-        initializeUI();
-        controller.initializeCalendar();
     }
 
-    private void initializeUI() {
-        setTitle("Calendrier des Réservations - Connecté : " + utilisateurConnecte.getPrenom());
-        setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
+    public void afficher(Stage stage) {
+        this.stage = stage;
+
+        BorderPane root = new BorderPane();
 
         // Navigation mois
-        JPanel monthPanel = new JPanel();
-        monthLabel = new JLabel("", JLabel.CENTER);
-        monthPanel.add(monthLabel);
+        HBox topPanel = new HBox(10);
+        topPanel.setAlignment(Pos.CENTER);
+        topPanel.setPadding(new Insets(10));
 
-        JButton prevButton = new JButton("<");
-        prevButton.addActionListener(e -> navigateMonth(-1));
+        Button prevButton = new Button("<");
+        Button nextButton = new Button(">");
 
-        JButton nextButton = new JButton(">");
-        nextButton.addActionListener(e -> navigateMonth(1));
+        monthLabel = new Label();
+        monthLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        JPanel navPanel = new JPanel(new BorderLayout());
-        navPanel.add(prevButton, BorderLayout.WEST);
-        navPanel.add(monthPanel, BorderLayout.CENTER);
-        navPanel.add(nextButton, BorderLayout.EAST);
+        prevButton.setOnAction(e -> navigateMonth(-1));
+        nextButton.setOnAction(e -> navigateMonth(1));
 
-        // Panel du calendrier
-        calendarPanel = new JPanel(new GridLayout(0, 7));
+        topPanel.getChildren().addAll(prevButton, monthLabel, nextButton);
 
-        // Panel de droite : réservation
-        reservationPanel = new JPanel();
-        reservationPanel.setBorder(BorderFactory.createTitledBorder("Réservation"));
+        // Grille du calendrier
+        calendarGrid = new GridPane();
+        calendarGrid.setHgap(5);
+        calendarGrid.setVgap(5);
+        calendarGrid.setPadding(new Insets(10));
 
-        // Panel permanent pour le bouton en bas
-        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton recapBtn = new JButton("Voir mes réservations");
-        recapBtn.addActionListener(e -> new VueReservations(utilisateurConnecte).setVisible(true));
-        footerPanel.add(recapBtn);
+        ScrollPane calendarScroll = new ScrollPane(calendarGrid);
+        calendarScroll.setFitToWidth(true);
 
-        // Ajout des panels dans la frame
-        add(navPanel, BorderLayout.NORTH);
-        add(new JScrollPane(calendarPanel), BorderLayout.CENTER);
-        add(reservationPanel, BorderLayout.EAST);
-        add(footerPanel, BorderLayout.SOUTH);
+        // Panel réservation
+        reservationPanel = new VBox(10);
+        reservationPanel.setPadding(new Insets(10));
+        reservationPanel.setStyle("-fx-border-color: gray; -fx-border-width: 1;");
+
+        // Bas de page : bouton
+        Button voirReservationsBtn = new Button("Voir mes réservations");
+        voirReservationsBtn.setOnAction(e -> {
+            VueReservations vueRes = new VueReservations(utilisateurConnecte);
+            vueRes.afficher(new Stage());
+        });
+
+        HBox bottomPanel = new HBox(voirReservationsBtn);
+        bottomPanel.setPadding(new Insets(10));
+        bottomPanel.setAlignment(Pos.CENTER_RIGHT);
+
+        root.setTop(topPanel);
+        root.setCenter(calendarScroll);
+        root.setRight(reservationPanel);
+        root.setBottom(bottomPanel);
+
+        controller.initializeCalendar();
+
+        Scene scene = new Scene(root, 900, 600);
+        stage.setTitle("Calendrier - Connecté : " + utilisateurConnecte.getPrenom());
+        stage.setScene(scene);
+        stage.show();
     }
 
     public void displayMonth(YearMonth yearMonth) {
-        currentYearMonth = yearMonth;
-        monthLabel.setText(yearMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")));
-        calendarPanel.removeAll();
+        this.currentYearMonth = yearMonth;
+        monthLabel.setText(yearMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.FRENCH) + " " + yearMonth.getYear());
+
+        calendarGrid.getChildren().clear();
 
         String[] days = {"Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"};
-        for (String day : days) {
-            calendarPanel.add(new JLabel(day, JLabel.CENTER));
+        for (int i = 0; i < days.length; i++) {
+            Label label = new Label(days[i]);
+            label.setStyle("-fx-font-weight: bold;");
+            calendarGrid.add(label, i, 0);
         }
 
-        LocalDate firstOfMonth = yearMonth.atDay(1);
-        int dayOfWeek = firstOfMonth.getDayOfWeek().getValue();
+        LocalDate firstDay = yearMonth.atDay(1);
+        int startDayOfWeek = firstDay.getDayOfWeek().getValue(); // Lundi = 1
 
-        for (int i = 1; i < dayOfWeek; i++) {
-            calendarPanel.add(new JPanel());
-        }
+        int row = 1;
+        int col = startDayOfWeek - 1;
 
         for (int day = 1; day <= yearMonth.lengthOfMonth(); day++) {
             LocalDate date = yearMonth.atDay(day);
-            JButton dayButton = new JButton(String.valueOf(day));
-            dayButton.addActionListener(e -> showDayAttractions(date));
-            calendarPanel.add(dayButton);
-        }
+            Button dayBtn = new Button(String.valueOf(day));
+            dayBtn.setMaxWidth(Double.MAX_VALUE);
+            dayBtn.setOnAction(e -> showDayAttractions(date));
+            calendarGrid.add(dayBtn, col, row);
 
-        calendarPanel.revalidate();
-        calendarPanel.repaint();
+            col++;
+            if (col > 6) {
+                col = 0;
+                row++;
+            }
+        }
     }
 
-    private void navigateMonth(int months) {
-        displayMonth(currentYearMonth.plusMonths(months));
+    public YearMonth getCurrentYearMonth() {
+        return currentYearMonth;
+    }
+
+    private void navigateMonth(int delta) {
+        displayMonth(currentYearMonth.plusMonths(delta));
     }
 
     private void showDayAttractions(LocalDate date) {
-        reservationPanel.removeAll();
+        reservationPanel.getChildren().clear();
+
         List<String> attractions = controller.getAttractionsForDay(date);
 
         if (attractions.isEmpty()) {
-            reservationPanel.add(new JLabel("Aucune attraction disponible"));
+            reservationPanel.getChildren().add(new Label("Aucune attraction disponible"));
         } else {
-            JComboBox<String> attractionCombo = new JComboBox<>(attractions.toArray(new String[0]));
-            JButton reserveButton = new JButton("Réserver");
+            ComboBox<String> attractionCombo = new ComboBox<>();
+            attractionCombo.getItems().addAll(attractions);
+            attractionCombo.getSelectionModel().selectFirst();
 
-            reserveButton.addActionListener(e -> {
+            Button reserveBtn = new Button("Réserver");
+
+            reserveBtn.setOnAction(e -> {
                 if ("admin".equalsIgnoreCase(utilisateurConnecte.getRole())) {
-                    JOptionPane.showMessageDialog(this,
-                            "Les administrateurs ne sont pas autorisés à effectuer des réservations.",
-                            "Accès refusé",
-                            JOptionPane.WARNING_MESSAGE);
+                    showAlert(Alert.AlertType.WARNING, "Accès refusé", "Les administrateurs ne peuvent pas réserver.");
                     return;
                 }
 
-                String selected = (String) attractionCombo.getSelectedItem();
                 try {
-                    AttractionDAO attractionDAO = new AttractionDAO(ConnexionBDD.getConnexion());
-                    int idAttraction = attractionDAO.getAttractionIdByName(selected);
-                    ReservationDAO dao = new ReservationDAO(ConnexionBDD.getConnexion());
-                    dao.ajouterReservation(utilisateurConnecte.getId(), idAttraction, Date.valueOf(date));
-                    JOptionPane.showMessageDialog(this, "Réservation ajoutée pour " + selected);
+                    String selected = attractionCombo.getValue();
+                    int idAttr = new AttractionDAO(ConnexionBDD.getConnexion()).getAttractionIdByName(selected);
+                    new ReservationDAO(ConnexionBDD.getConnexion()).ajouterReservation(utilisateurConnecte.getId(), idAttr, Date.valueOf(date));
+                    showAlert(Alert.AlertType.INFORMATION, "Succès", "Réservation ajoutée pour " + selected);
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "Erreur lors de la réservation.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la réservation.");
                 }
             });
 
-            reservationPanel.add(new JLabel("Attractions:"));
-            reservationPanel.add(attractionCombo);
-            reservationPanel.add(reserveButton);
+            reservationPanel.getChildren().addAll(
+                    new Label("Attractions disponibles le " + date + " :"),
+                    attractionCombo,
+                    reserveBtn
+            );
         }
+    }
 
-        reservationPanel.revalidate();
-        reservationPanel.repaint();
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setHeaderText(title);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
