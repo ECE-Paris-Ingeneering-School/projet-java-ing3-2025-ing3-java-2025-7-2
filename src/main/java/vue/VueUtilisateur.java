@@ -1,255 +1,261 @@
 package vue;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
+import modele.Utilisateur;
 import modele.Attraction;
 import modele.Evenement;
-import modele.Utilisateur;
 import modele.dao.AttractionDAO;
 import modele.dao.EvenementDAO;
+import modele.dao.ConnexionBDD;
 
+import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 
 public class VueUtilisateur {
 
-    private static Scanner scanner = new Scanner(System.in);
+    public static void afficher(Stage stage, ConnexionBDD conn, Utilisateur utilisateur) throws SQLException, IOException, ClassNotFoundException {
+        stage.setTitle("Mon Profil");
 
-    // Cette méthode affiche les informations de l'utilisateur
-    public static void afficherInfos(Utilisateur utilisateur, Connection conn) {
-        System.out.println("\n=== Informations de l'Utilisateur ===");
-        System.out.println("Nom : " + utilisateur.getNom());
-        System.out.println("Prénom : " + utilisateur.getPrenom());
-        System.out.println("Email : " + utilisateur.getEmail());
-        System.out.println("Role : " + utilisateur.getRole());
+        // ===== Logo en haut à gauche =====
+        Image logoImage = new Image(VueUtilisateur.class.getResource("/images/logo_JP.png").toExternalForm());
+        ImageView logoView = new ImageView(logoImage);
+        logoView.setFitHeight(80);
+        logoView.setPreserveRatio(true);
+        HBox logoBox = new HBox(logoView);
+        logoBox.setAlignment(Pos.TOP_LEFT);
+        logoBox.setPadding(new Insets(10, 0, 0, 10));
 
-        // Si l'utilisateur est un admin, afficher les options de gestion des attractions et événements
-        if (utilisateur.getRole().equalsIgnoreCase("admin")) {
-            afficherMenuAdmin(conn);
-        }
-    }
+        // ===== Conteneur principal =====
+        VBox mainLayout = new VBox(20);
+        mainLayout.setAlignment(Pos.TOP_CENTER);
+        mainLayout.setPadding(new Insets(10));
 
-    // Afficher les attractions populaires
-    public static void afficherAttractionsPopulaires(AttractionDAO attractionDAO) {
-        Map<String, Integer> attractionsPopulaires;
-        try {
-            attractionsPopulaires = attractionDAO.getAttractionsLesPlusReservees();
-            System.out.println("\n=== Attractions les plus populaires ===");
-            attractionsPopulaires.forEach((nom, total) -> {
-                System.out.println("Attraction: " + nom + " - Réservations: " + total);
+        // ===== Informations de l'utilisateur =====
+        VBox vboxUserInfo = new VBox(15);
+        vboxUserInfo.setAlignment(Pos.CENTER);
+        vboxUserInfo.setStyle("-fx-background-color: #ecf0f1; -fx-padding: 20; -fx-border-radius: 10;");
+        vboxUserInfo.setMaxWidth(400);
+
+        // Afficher toutes les infos de l'utilisateur
+        Label utilisateurInfo = new Label("Nom: " + utilisateur.getNom() +
+                "\nEmail: " + utilisateur.getEmail() +
+                "\nRôle: " + utilisateur.getRole() );
+        utilisateurInfo.setFont(Font.font("Arial", 14));
+        utilisateurInfo.setTextFill(Color.web("#2c3e50"));
+        utilisateurInfo.setStyle("-fx-border-color: #bdc3c7; -fx-border-radius: 10; -fx-padding: 10;");
+        vboxUserInfo.getChildren().add(utilisateurInfo);
+
+        // ===== Gestion des attractions (pour l'administrateur) =====
+        if (utilisateur.getRole().equals("admin")) {
+            // Titre de gestion des attractions
+            Label gestionAttractionsLabel = new Label("Gestion des Attractions");
+            gestionAttractionsLabel.setFont(Font.font("Arial", 16));
+            gestionAttractionsLabel.setTextFill(Color.web("#2c3e50"));
+
+            // Récupérer les attractions
+            AttractionDAO attractionDAO = new AttractionDAO(conn.getConnexion());
+            List<Attraction> attractions = attractionDAO.getAllAttractions();
+            ListView<String> attractionsListView = new ListView<>();
+            for (Attraction attraction : attractions) {
+                attractionsListView.getItems().add(attraction.getNom() + " - Prix: " + attraction.getPrix());
+            }
+
+            // Bouton pour ajouter une attraction
+            Button btnAjouterAttraction = new Button("Ajouter une Attraction");
+            btnAjouterAttraction.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 10;");
+
+            // Bouton pour modifier une attraction
+            Button btnModifierAttraction = new Button("Modifier une Attraction");
+            btnModifierAttraction.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-background-radius: 10;");
+
+            // Bouton pour supprimer une attraction
+            Button btnSupprimerAttraction = new Button("Supprimer une Attraction");
+            btnSupprimerAttraction.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 10;");
+
+            // Ajouter les éléments dans la vue
+            vboxUserInfo.getChildren().addAll(gestionAttractionsLabel, attractionsListView, btnAjouterAttraction, btnModifierAttraction, btnSupprimerAttraction);
+
+            // Action pour ajouter une attraction
+            btnAjouterAttraction.setOnAction(e -> {
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Ajouter une Attraction");
+                dialog.setHeaderText("Nom de l'Attraction");
+                dialog.setContentText("Entrez le nom de l'attraction :");
+                dialog.showAndWait().ifPresent(nom -> {
+                    // Vous pouvez ajouter plus de champs ici, comme le prix et l'image
+                    try {
+                        attractionDAO.ajouterAttraction(nom, 10.0, "image_path");
+                        attractionsListView.getItems().add(nom + " - Prix: 10.0");
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                });
             });
-        } catch (Exception e) {
-            System.out.println("Erreur lors de la récupération des attractions populaires : " + e.getMessage());
-        }
-    }
 
-    // Afficher les événements en cours
-    public static void afficherEvenements(EvenementDAO evenementDAO) {
-        try {
-            List<String> evenements = evenementDAO.getEvenementsForDay(java.time.LocalDate.now());
-            System.out.println("\n=== Événements en cours aujourd'hui ===");
-            for (String evenement : evenements) {
-                System.out.println(evenement);
+            // Action pour modifier une attraction
+            btnModifierAttraction.setOnAction(e -> {
+                String selectedAttraction = attractionsListView.getSelectionModel().getSelectedItem();
+                if (selectedAttraction != null) {
+                    String attractionName = selectedAttraction.split(" - ")[0];
+                    TextInputDialog dialog = new TextInputDialog(attractionName);
+                    dialog.setTitle("Modifier l'Attraction");
+                    dialog.setHeaderText("Modifier le nom de l'attraction");
+                    dialog.setContentText("Entrez le nouveau nom de l'attraction :");
+                    dialog.showAndWait().ifPresent(newNom -> {
+                        try {
+                            int attractionId = attractionDAO.getIdAttractionParNom(attractionName);
+                            attractionDAO.modifierAttraction(attractionId, newNom, 10.0, "new_image_path");
+                            attractionsListView.getItems().set(attractionsListView.getSelectionModel().getSelectedIndex(), newNom + " - Prix: 10.0");
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                        }
+                    });
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Avertissement");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Veuillez sélectionner une attraction à modifier.");
+                    alert.showAndWait();
+                }
+            });
+
+            // Action pour supprimer une attraction
+            btnSupprimerAttraction.setOnAction(e -> {
+                String selectedAttraction = attractionsListView.getSelectionModel().getSelectedItem();
+                if (selectedAttraction != null) {
+                    String attractionName = selectedAttraction.split(" - ")[0];
+                    try {
+                        int attractionId = attractionDAO.getIdAttractionParNom(attractionName);
+                        attractionDAO.supprimerAttraction(attractionId);
+                        attractionsListView.getItems().remove(selectedAttraction);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Avertissement");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Veuillez sélectionner une attraction à supprimer.");
+                    alert.showAndWait();
+                }
+            });
+        }
+
+        // ===== Gestion des événements (pour l'administrateur) =====
+        if (utilisateur.getRole().equals("admin")) {
+            // Titre de gestion des événements
+            Label gestionEvenementsLabel = new Label("Gestion des Événements");
+            gestionEvenementsLabel.setFont(Font.font("Arial", 16));
+            gestionEvenementsLabel.setTextFill(Color.web("#2c3e50"));
+
+            // Récupérer les événements
+            EvenementDAO evenementDAO = new EvenementDAO(conn.getConnexion());
+            List<Evenement> evenements = evenementDAO.getAllEvenements();
+            ListView<String> evenementsListView = new ListView<>();
+            for (Evenement evenement : evenements) {
+                evenementsListView.getItems().add(evenement.getNom() + " - Du " + evenement.getDateDebut() + " au " + evenement.getDateFin());
             }
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de la récupération des événements : " + e.getMessage());
+
+            // Bouton pour ajouter un événement
+            Button btnAjouterEvenement = new Button("Ajouter un Événement");
+            btnAjouterEvenement.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 10;");
+
+            // Bouton pour modifier un événement
+            Button btnModifierEvenement = new Button("Modifier un Événement");
+            btnModifierEvenement.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-background-radius: 10;");
+
+            // Bouton pour supprimer un événement
+            Button btnSupprimerEvenement = new Button("Supprimer un Événement");
+            btnSupprimerEvenement.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 10;");
+
+            // Ajouter les éléments dans la vue
+            vboxUserInfo.getChildren().addAll(gestionEvenementsLabel, evenementsListView, btnAjouterEvenement, btnModifierEvenement, btnSupprimerEvenement);
+
+            // Action pour ajouter un événement
+            btnAjouterEvenement.setOnAction(e -> {
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Ajouter un Événement");
+                dialog.setHeaderText("Nom de l'Événement");
+                dialog.setContentText("Entrez le nom de l'événement :");
+                dialog.showAndWait().ifPresent(nom -> {
+                    // Vous pouvez ajouter plus de champs ici, comme les dates et le supplément
+                    try {
+                        evenementDAO.ajouterEvenement(nom, 5.0, java.sql.Date.valueOf("2025-01-01"), java.sql.Date.valueOf("2025-01-05"));
+                        evenementsListView.getItems().add(nom + " - Du 2025-01-01 au 2025-01-05");
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                });
+            });
+
+            // Action pour modifier un événement
+            btnModifierEvenement.setOnAction(e -> {
+                String selectedEvenement = evenementsListView.getSelectionModel().getSelectedItem();
+                if (selectedEvenement != null) {
+                    String evenementName = selectedEvenement.split(" - ")[0];
+                    TextInputDialog dialog = new TextInputDialog(evenementName);
+                    dialog.setTitle("Modifier l'Événement");
+                    dialog.setHeaderText("Modifier le nom de l'événement");
+                    dialog.setContentText("Entrez le nouveau nom de l'événement :");
+                    dialog.showAndWait().ifPresent(newNom -> {
+                        try {
+                            Evenement event = evenementDAO.getEvenementParId(Integer.parseInt(evenementName));
+                            evenementDAO.modifierEvenement(event.getIdEvenement(), newNom, 5.0, java.sql.Date.valueOf("2025-01-01"), java.sql.Date.valueOf("2025-01-05"));
+                            evenementsListView.getItems().set(evenementsListView.getSelectionModel().getSelectedIndex(), newNom + " - Du 2025-01-01 au 2025-01-05");
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                        }
+                    });
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Avertissement");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Veuillez sélectionner un événement à modifier.");
+                    alert.showAndWait();
+                }
+            });
+
+            // Action pour supprimer un événement
+            btnSupprimerEvenement.setOnAction(e -> {
+                String selectedEvenement = evenementsListView.getSelectionModel().getSelectedItem();
+                if (selectedEvenement != null) {
+                    String evenementName = selectedEvenement.split(" - ")[0];
+                    try {
+                        Evenement event = evenementDAO.getEvenementParId(Integer.parseInt(evenementName));
+                        evenementDAO.supprimerEvenement(event.getIdEvenement());
+                        evenementsListView.getItems().remove(selectedEvenement);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Avertissement");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Veuillez sélectionner un événement à supprimer.");
+                    alert.showAndWait();
+                }
+            });
         }
-    }
 
-    // Afficher le menu de gestion admin
-    private static void afficherMenuAdmin(Connection conn) {
-        System.out.println("\n=== Menu Admin ===");
-        System.out.println("1. Gérer les attractions");
-        System.out.println("2. Gérer les événements");
-        System.out.print("Choisissez une option : ");
-        int choix = scanner.nextInt();
-        scanner.nextLine(); // Consommer la nouvelle ligne après le choix
+        // ===== Conteneur final =====
+        ScrollPane scrollPane = new ScrollPane(vboxUserInfo);
+        scrollPane.setFitToWidth(true); // Ajuste la largeur du contenu au ScrollPane
+        scrollPane.setStyle("-fx-background-color: #ecf0f1;");
 
-        switch (choix) {
-            case 1:
-                gererAttractions(new AttractionDAO(conn));
-                break;
-            case 2:
-                gererEvenements(new EvenementDAO(conn));
-                break;
-            default:
-                System.out.println("Option invalide.");
-        }
-    }
-
-    // Méthode pour gérer les attractions : ajouter, modifier, supprimer
-    public static void gererAttractions(AttractionDAO attractionDAO) {
-        System.out.println("\n=== Gestion des Attractions ===");
-        System.out.println("1. Ajouter une nouvelle attraction");
-        System.out.println("2. Modifier une attraction existante");
-        System.out.println("3. Supprimer une attraction");
-        System.out.print("Choisissez une option : ");
-
-        int choix = scanner.nextInt();
-        scanner.nextLine();  // Consommer la nouvelle ligne après le choix
-
-        switch (choix) {
-            case 1:
-                ajouterAttraction(attractionDAO);
-                break;
-            case 2:
-                modifierAttraction(attractionDAO);
-                break;
-            case 3:
-                supprimerAttraction(attractionDAO);
-                break;
-            default:
-                System.out.println("Option invalide.");
-                break;
-        }
-    }
-
-    // Ajouter une nouvelle attraction
-    private static void ajouterAttraction(AttractionDAO attractionDAO) {
-        System.out.print("Nom de l'attraction : ");
-        String nom = scanner.nextLine();
-        System.out.print("Prix de l'attraction : ");
-        double prix = scanner.nextDouble();
-        scanner.nextLine();  // Consommer la nouvelle ligne
-        System.out.print("Image de l'attraction (URL) : ");
-        String image = scanner.nextLine();
-
-        try {
-            attractionDAO.ajouterAttraction(nom, prix, image);
-            System.out.println("Attraction ajoutée avec succès !");
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de l'ajout de l'attraction : " + e.getMessage());
-        }
-    }
-
-    // Modifier une attraction existante
-    private static void modifierAttraction(AttractionDAO attractionDAO) {
-        System.out.print("Entrez l'ID de l'attraction à modifier : ");
-        int id = scanner.nextInt();
-        scanner.nextLine();  // Consommer la nouvelle ligne
-
-        try {
-            Attraction attraction = attractionDAO.getAttractionParNom(id);
-            if (attraction != null) {
-                System.out.print("Nouveau nom de l'attraction (actuel : " + attraction.getNom() + ") : ");
-                String nom = scanner.nextLine();
-                System.out.print("Nouveau prix de l'attraction (actuel : " + attraction.getPrix() + ") : ");
-                double prix = scanner.nextDouble();
-                scanner.nextLine();  // Consommer la nouvelle ligne
-                System.out.print("Nouvelle image de l'attraction (actuelle : " + attraction.getImage() + ") : ");
-                String image = scanner.nextLine();
-
-                attractionDAO.modifierAttraction(id, nom, prix, image);
-                System.out.println("Attraction modifiée avec succès !");
-            } else {
-                System.out.println("Attraction non trouvée.");
-            }
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de la modification de l'attraction : " + e.getMessage());
-        }
-    }
-
-    // Supprimer une attraction
-    private static void supprimerAttraction(AttractionDAO attractionDAO) {
-        System.out.print("Entrez l'ID de l'attraction à supprimer : ");
-        int id = scanner.nextInt();
-
-        try {
-            attractionDAO.supprimerAttraction(id);
-            System.out.println("Attraction supprimée avec succès !");
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de la suppression de l'attraction : " + e.getMessage());
-        }
-    }
-
-    // Méthode pour gérer les événements : ajouter, modifier, supprimer
-    public static void gererEvenements(EvenementDAO evenementDAO) {
-        System.out.println("\n=== Gestion des Événements ===");
-        System.out.println("1. Ajouter un nouvel événement");
-        System.out.println("2. Modifier un événement existant");
-        System.out.println("3. Supprimer un événement");
-        System.out.print("Choisissez une option : ");
-
-        int choix = scanner.nextInt();
-        scanner.nextLine();  // Consommer la nouvelle ligne après le choix
-
-        switch (choix) {
-            case 1:
-                ajouterEvenement(evenementDAO);
-                break;
-            case 2:
-                modifierEvenement(evenementDAO);
-                break;
-            case 3:
-                supprimerEvenement(evenementDAO);
-                break;
-            default:
-                System.out.println("Option invalide.");
-                break;
-        }
-    }
-
-    // Ajouter un nouvel événement
-    private static void ajouterEvenement(EvenementDAO evenementDAO) {
-        System.out.print("Nom de l'événement : ");
-        String nom = scanner.nextLine();
-        System.out.print("Supplément de l'événement : ");
-        double supplement = scanner.nextDouble();
-        scanner.nextLine();  // Consommer la nouvelle ligne
-        System.out.print("Date de début de l'événement (yyyy-mm-dd) : ");
-        String dateDebut = scanner.nextLine();
-        System.out.print("Date de fin de l'événement (yyyy-mm-dd) : ");
-        String dateFin = scanner.nextLine();
-
-        try {
-            evenementDAO.ajouterEvenement(nom, supplement, Date.valueOf(dateDebut), Date.valueOf(dateFin));
-            System.out.println("Événement ajouté avec succès !");
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de l'ajout de l'événement : " + e.getMessage());
-        }
-    }
-
-    // Modifier un événement existant
-    private static void modifierEvenement(EvenementDAO evenementDAO) {
-        System.out.print("Entrez l'ID de l'événement à modifier : ");
-        int id = scanner.nextInt();
-        scanner.nextLine();  // Consommer la nouvelle ligne
-
-        try {
-            Evenement evenement = evenementDAO.getEvenementParId(id);
-            if (evenement != null) {
-                System.out.print("Nouveau nom de l'événement (actuel : " + evenement.getNom() + ") : ");
-                String nom = scanner.nextLine();
-                System.out.print("Nouveau supplément de l'événement (actuel : " + evenement.getSupplement() + ") : ");
-                double supplement = scanner.nextDouble();
-                scanner.nextLine();  // Consommer la nouvelle ligne
-                System.out.print("Nouvelle date de début de l'événement (actuelle : " + evenement.getDateDebut() + ") : ");
-                String dateDebut = scanner.nextLine();
-                System.out.print("Nouvelle date de fin de l'événement (actuelle : " + evenement.getDateFin() + ") : ");
-                String dateFin = scanner.nextLine();
-
-                evenementDAO.modifierEvenement(id, nom, supplement, Date.valueOf(dateDebut), Date.valueOf(dateFin));
-                System.out.println("Événement modifié avec succès !");
-            } else {
-                System.out.println("Événement non trouvé.");
-            }
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de la modification de l'événement : " + e.getMessage());
-        }
-    }
-
-    // Supprimer un événement
-    private static void supprimerEvenement(EvenementDAO evenementDAO) {
-        System.out.print("Entrez l'ID de l'événement à supprimer : ");
-        int id = scanner.nextInt();
-
-        try {
-            evenementDAO.supprimerEvenement(id);
-            System.out.println("Événement supprimé avec succès !");
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de la suppression de l'événement : " + e.getMessage());
-        }
+        // Créer la scène et l'afficher
+        Scene scene = new Scene(scrollPane, 600, 700);
+        stage.setScene(scene);
+        stage.show();
     }
 }
