@@ -84,6 +84,7 @@ public class vueConnexion extends Application {
                 messageLabel.setTextFill(Color.RED);
                 e.printStackTrace();
             }
+
         });
 
         // ===== Navigation style mobile =====
