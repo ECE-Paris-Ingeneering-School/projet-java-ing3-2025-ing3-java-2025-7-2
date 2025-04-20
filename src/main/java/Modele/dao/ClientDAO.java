@@ -1,6 +1,8 @@
 package modele.dao;
 
 import modele.Client;
+
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
@@ -29,6 +31,10 @@ public class ClientDAO {
 
         } catch (SQLException e) {
             System.err.println(" Erreur lors de la récupération des clients : " + e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
         return liste_clients;
