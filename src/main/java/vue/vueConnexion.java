@@ -58,34 +58,11 @@ public class vueConnexion extends Application {
                         "-fx-padding: 8 20 8 20;"
         );
 
-        loginButton.setOnAction(event -> {
-            String mail = emailField.getText();
-            String motDePasse = passwordField.getText();
+        loginButton.setOnAction(event -> connecter(emailField, passwordField, messageLabel, primaryStage));
 
-            AuthentificationService auth = new AuthentificationService();
-
-            try (Connection conn = ConnexionBDD.getConnexion()) {
-                Utilisateur utilisateur = auth.connecter(mail, motDePasse, conn);
-
-                if (utilisateur != null) {
-                    messageLabel.setText("Connexion réussie !");
-                    messageLabel.setTextFill(Color.GREEN);
-
-                    // Changer de scène vers le calendrier JavaFX
-                    VueCalendrier vueCalendrier = new VueCalendrier(utilisateur);
-                    vueCalendrier.afficher(primaryStage);
-
-                } else {
-                    messageLabel.setText("Identifiants incorrects.");
-                    messageLabel.setTextFill(Color.RED);
-                }
-            } catch (Exception e) {
-                messageLabel.setText("Erreur de connexion.");
-                messageLabel.setTextFill(Color.RED);
-                e.printStackTrace();
-            }
-
-        });
+        // ===== Ajout du gestionnaire d'événement pour "Entrée" =====
+        emailField.setOnAction(event -> connecter(emailField, passwordField, messageLabel, primaryStage));
+        passwordField.setOnAction(event -> connecter(emailField, passwordField, messageLabel, primaryStage));
 
         // ===== Navigation style mobile =====
         HBox navBar = new HBox(15);
@@ -144,6 +121,34 @@ public class vueConnexion extends Application {
                         "-fx-padding: 10;"
         );
         return btn;
+    }
+
+    private void connecter(TextField emailField, PasswordField passwordField, Label messageLabel, Stage primaryStage) {
+        String mail = emailField.getText();
+        String motDePasse = passwordField.getText();
+
+        AuthentificationService auth = new AuthentificationService();
+
+        try (Connection conn = ConnexionBDD.getConnexion()) {
+            Utilisateur utilisateur = auth.connecter(mail, motDePasse, conn);
+
+            if (utilisateur != null) {
+                messageLabel.setText("Connexion réussie !");
+                messageLabel.setTextFill(Color.GREEN);
+
+                // Changer de scène vers le calendrier JavaFX
+                VueCalendrier vueCalendrier = new VueCalendrier(utilisateur);
+                vueCalendrier.afficher(primaryStage);
+
+            } else {
+                messageLabel.setText("Identifiants incorrects.");
+                messageLabel.setTextFill(Color.RED);
+            }
+        } catch (Exception e) {
+            messageLabel.setText("Erreur de connexion.");
+            messageLabel.setTextFill(Color.RED);
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
