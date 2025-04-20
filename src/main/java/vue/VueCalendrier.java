@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import modele.Utilisateur;
 import modele.dao.AttractionDAO;
@@ -38,8 +39,9 @@ public class VueCalendrier {
         this.stage = stage;
 
         BorderPane root = new BorderPane();
+        root.setStyle("-fx-background-color: #d0f5c8;"); // fond vert clair Jurassic Park
 
-        // Navigation mois
+        // ===== Titre du mois et navigation =====
         HBox topPanel = new HBox(10);
         topPanel.setAlignment(Pos.CENTER);
         topPanel.setPadding(new Insets(10));
@@ -48,14 +50,14 @@ public class VueCalendrier {
         Button nextButton = new Button(">");
 
         monthLabel = new Label();
-        monthLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        monthLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         prevButton.setOnAction(e -> navigateMonth(-1));
         nextButton.setOnAction(e -> navigateMonth(1));
 
         topPanel.getChildren().addAll(prevButton, monthLabel, nextButton);
 
-        // Grille du calendrier
+        // ===== Grille calendrier =====
         calendarGrid = new GridPane();
         calendarGrid.setHgap(5);
         calendarGrid.setVgap(5);
@@ -63,35 +65,70 @@ public class VueCalendrier {
 
         ScrollPane calendarScroll = new ScrollPane(calendarGrid);
         calendarScroll.setFitToWidth(true);
+        calendarScroll.setStyle("-fx-background-color: transparent;");
 
-        // Panel réservation
+        // ===== Panel réservation =====
         reservationPanel = new VBox(10);
         reservationPanel.setPadding(new Insets(10));
         reservationPanel.setStyle("-fx-border-color: gray; -fx-border-width: 1;");
 
-        // Bas de page : bouton
+        // ===== Bouton voir réservations =====
         Button voirReservationsBtn = new Button("Voir mes réservations");
+        voirReservationsBtn.setStyle(
+                "-fx-background-color: #3498db;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-padding: 8 20 8 20;"
+        );
         voirReservationsBtn.setOnAction(e -> {
             VueReservations vueRes = new VueReservations(utilisateurConnecte);
             vueRes.afficher(new Stage());
         });
 
-        HBox bottomPanel = new HBox(voirReservationsBtn);
-        bottomPanel.setPadding(new Insets(10));
-        bottomPanel.setAlignment(Pos.CENTER_RIGHT);
+        VBox centerContent = new VBox(10, topPanel, calendarScroll, reservationPanel, voirReservationsBtn);
+        centerContent.setAlignment(Pos.TOP_CENTER);
+        centerContent.setPadding(new Insets(10));
 
-        root.setTop(topPanel);
-        root.setCenter(calendarScroll);
-        root.setRight(reservationPanel);
-        root.setBottom(bottomPanel);
+        // ===== Barre de navigation mobile en bas =====
+        HBox navBar = new HBox(15);
+        navBar.setAlignment(Pos.CENTER);
+        navBar.setPadding(new Insets(15));
+        navBar.setStyle("-fx-background-color: yellow;");
+
+        Button btnHome = creerBoutonNavigation("🏠");
+        Button btnCalendar = creerBoutonNavigation("📅");
+        Button btnCart = creerBoutonNavigation("🛒");
+        Button btnUser = creerBoutonNavigation("👤");
+
+        navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
+
+        // ===== Placement dans BorderPane =====
+        root.setCenter(centerContent);
+        root.setBottom(navBar);
 
         controller.initializeCalendar();
 
-        Scene scene = new Scene(root, 900, 600);
-        stage.setTitle("Calendrier - Connecté : " + utilisateurConnecte.getPrenom());
+        Scene scene = new Scene(root, 350, 600);
+        stage.setTitle("Calendrier - " + utilisateurConnecte.getPrenom());
         stage.setScene(scene);
         stage.show();
     }
+
+    private Button creerBoutonNavigation(String emoji) {
+        Button btn = new Button(emoji);
+        btn.setStyle(
+                "-fx-background-color: black;" +
+                        "-fx-text-fill: yellow;" +
+                        "-fx-font-size: 18px;" +
+                        "-fx-background-radius: 10;" +
+                        "-fx-min-width: 60px;" +
+                        "-fx-min-height: 60px;" +
+                        "-fx-padding: 10;"
+        );
+        return btn;
+    }
+
 
     public void displayMonth(YearMonth yearMonth) {
         this.currentYearMonth = yearMonth;
@@ -127,10 +164,6 @@ public class VueCalendrier {
         }
     }
 
-    public YearMonth getCurrentYearMonth() {
-        return currentYearMonth;
-    }
-
     private void navigateMonth(int delta) {
         displayMonth(currentYearMonth.plusMonths(delta));
     }
@@ -148,6 +181,12 @@ public class VueCalendrier {
             attractionCombo.getSelectionModel().selectFirst();
 
             Button reserveBtn = new Button("Réserver");
+            reserveBtn.setStyle(
+                    "-fx-background-color: #e74c3c;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-background-radius: 15;" +
+                            "-fx-padding: 6 15 6 15;"
+            );
 
             reserveBtn.setOnAction(e -> {
                 if ("admin".equalsIgnoreCase(utilisateurConnecte.getRole())) {
@@ -179,5 +218,9 @@ public class VueCalendrier {
         alert.setHeaderText(title);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    public YearMonth getCurrentYearMonth() {
+        return currentYearMonth;
     }
 }

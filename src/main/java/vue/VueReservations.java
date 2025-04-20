@@ -5,9 +5,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import modele.Utilisateur;
 import modele.dao.ConnexionBDD;
@@ -18,143 +15,162 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-// ... imports inchangés
-
 public class VueReservations {
 
-    private Utilisateur utilisateur;
+    private final Utilisateur utilisateur;
     private VBox contentBox;
+
+    public VueReservations(Utilisateur utilisateur) {
+        this.utilisateur = utilisateur;
+    }
+
+    // Crée un bouton de nav identique à vueConnexion
+    private Button creerBoutonNavigation(String emoji) {
+        Button btn = new Button(emoji);
+        btn.setStyle(
+                "-fx-background-color: black;" +
+                        "-fx-text-fill: yellow;" +
+                        "-fx-font-size: 18px;" +
+                        "-fx-background-radius: 10;" +
+                        "-fx-min-width: 60px;" +
+                        "-fx-min-height: 60px;" +
+                        "-fx-padding: 10;"
+        );
+        return btn;
+    }
+
+    private boolean showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type, message, ButtonType.OK);
+        alert.setHeaderText(title);
+        alert.showAndWait();
+        return alert.getResult() == ButtonType.OK;
+    }
 
     private void afficherFacture(int idFacture) {
         contentBox.getChildren().clear();
 
         try {
             ReservationDAO dao = new ReservationDAO(ConnexionBDD.getConnexion());
-            Map<String, Object> factureInfo = dao.getFactureDetailsAvecReservations(idFacture);
+            Map<String, Object> info = dao.getFactureDetailsAvecReservations(idFacture);
 
             Label titre = new Label("🧾 Facture #" + idFacture);
-            titre.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-            titre.setTextFill(Color.web("#2c3e50"));
-            titre.setAlignment(Pos.CENTER);
-            titre.setPadding(new Insets(10));
-            titre.setMaxWidth(Double.MAX_VALUE);
-            VBox.setMargin(titre, new Insets(10, 0, 10, 0));
+            titre.setStyle("-fx-font-size:16px; -fx-font-weight:bold; -fx-text-fill:#2c3e50;");
             contentBox.getChildren().add(titre);
 
-            Label dateLabel = new Label("Date de facture : " + factureInfo.get("date"));
-            Label nbLabel = new Label("Nombre de réservations : " + factureInfo.get("nb"));
-            Label totalLabel = new Label("Prix total : " + factureInfo.get("total") + " €");
-
-            List<Label> details = List.of(dateLabel, nbLabel, totalLabel);
-            for (Label lbl : details) {
-                lbl.setFont(Font.font("Arial", 14));
-                lbl.setTextFill(Color.BLACK);
-                contentBox.getChildren().add(lbl);
-            }
-
+            contentBox.getChildren().add(new Label("Date : " + info.get("date")));
+            contentBox.getChildren().add(new Label("Nb réservations : " + info.get("nb")));
+            contentBox.getChildren().add(new Label("Total : " + info.get("total") + " €"));
             contentBox.getChildren().add(new Label(""));
 
-            Label sousTitre = new Label("Détail des réservations :");
-            sousTitre.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-            sousTitre.setTextFill(Color.DARKGREEN);
-            contentBox.getChildren().add(sousTitre);
-
             @SuppressWarnings("unchecked")
-            List<String> lignes = (List<String>) factureInfo.get("reservations");
-
+            List<String> lignes = (List<String>) info.get("reservations");
             for (String ligne : lignes) {
-                Label ligneLabel = new Label("• " + ligne);
-                ligneLabel.setFont(Font.font("Arial", 13));
-                ligneLabel.setWrapText(true);
-                contentBox.getChildren().add(ligneLabel);
+                contentBox.getChildren().add(new Label("• " + ligne));
             }
-
         } catch (Exception ex) {
             ex.printStackTrace();
-            Label erreur = new Label("Erreur lors de l'affichage de la facture.");
-            erreur.setTextFill(Color.RED);
-            contentBox.getChildren().add(erreur);
+            contentBox.getChildren().add(new Label("Erreur lors de l'affichage de la facture."));
         }
     }
 
-    public VueReservations(Utilisateur utilisateur) {
-        this.utilisateur = utilisateur;
-    }
-
     public void afficher(Stage stage) {
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(15));
-        contentBox = new VBox(10);
-        root.getChildren().add(contentBox);
+        // Racine
+        BorderPane root = new BorderPane();
+        root.setStyle("-fx-background-color: #d0f5c8;"); // Fond vert clair Jurassic Park
 
+        // ===== Contenu central vertical =====
+        contentBox = new VBox(15);
+        contentBox.setAlignment(Pos.TOP_CENTER);
+        contentBox.setPadding(new Insets(20));
+
+        // Titre
+        Date today = Date.valueOf(LocalDate.now());
+        Label titre = new Label("Vos réservations du " + today);
+        titre.setStyle("-fx-font-size:18px; -fx-font-weight:bold;");
+
+        contentBox.getChildren().add(titre);
+
+        // Chargement des réservations
         try {
             ReservationDAO dao = new ReservationDAO(ConnexionBDD.getConnexion());
-            Date today = Date.valueOf(LocalDate.now());
-            List<String> reservations = dao.getReservationsDetailsParClientEtDate(utilisateur.getId(), today);
+            List<String> resList = dao.getReservationsDetailsParClientEtDate(utilisateur.getId(), today);
 
-            Label titre = new Label("Vos réservations pour aujourd'hui (" + today + ") :");
-            titre.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-            contentBox.getChildren().add(titre);
-
-            if (reservations.isEmpty()) {
+            if (resList.isEmpty()) {
                 contentBox.getChildren().add(new Label("Aucune réservation trouvée."));
             } else {
-                for (String res : reservations) {
+                for (String res : resList) {
                     HBox ligne = new HBox(10);
                     ligne.setAlignment(Pos.CENTER_LEFT);
 
-                    Label label = new Label(res);
-                    Button deleteBtn = new Button("Supprimer");
-
-                    deleteBtn.setOnAction(e -> {
+                    Label lbl = new Label(res);
+                    Button del = new Button("Supprimer");
+                    del.setOnAction(e -> {
                         try {
                             int idRes = Integer.parseInt(res.split("#")[1].split(" ")[0]);
                             dao.supprimerReservation(idRes);
                             showAlert(Alert.AlertType.INFORMATION, "Suppression", "Réservation supprimée.");
-                            stage.close();
+                            // rafraîchir la page
                             this.afficher(new Stage());
+                            stage.close();
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
                     });
 
-                    ligne.getChildren().addAll(label, deleteBtn);
+                    ligne.getChildren().addAll(lbl, del);
                     contentBox.getChildren().add(ligne);
                 }
-
-                Button confirmer = new Button("Confirmer & Générer Facture");
-                confirmer.setOnAction(e -> {
-                    try {
-                        int idFacture = dao.creerFacture(utilisateur.getId());
-                        boolean ok = showAlert(Alert.AlertType.INFORMATION, "Facture", "Facture générée avec succès !");
-                        if (ok) {
-                            afficherFacture(idFacture); // ✅ Affichage automatique après confirmation
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la génération.");
-                    }
-                });
-
-                contentBox.getChildren().add(confirmer);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
+            contentBox.getChildren().add(new Label("Erreur lors du chargement."));
         }
 
-        Scene scene = new Scene(new ScrollPane(root), 600, 400);
+        // Bouton confirmer & générer facture
+        Button confirmer = new Button("Confirmer & Générer Facture");
+        confirmer.setStyle(
+                "-fx-background-color: #e67e22;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-padding: 8 20 8 20;"
+        );
+        confirmer.setOnAction(e -> {
+            try {
+                ReservationDAO dao = new ReservationDAO(ConnexionBDD.getConnexion());
+                int idFacture = dao.creerFacture(utilisateur.getId());
+                boolean ok = showAlert(Alert.AlertType.INFORMATION, "Facture", "Facture générée avec succès !");
+                if (ok) afficherFacture(idFacture);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la génération.");
+            }
+        });
+        contentBox.getChildren().add(confirmer);
+
+        // Place le contenu au centre
+        ScrollPane scroll = new ScrollPane(contentBox);
+        scroll.setFitToWidth(true);
+        root.setCenter(scroll);
+
+        // ===== Barre de navigation en bas =====
+        HBox navBar = new HBox(15);
+        navBar.setAlignment(Pos.CENTER);
+        navBar.setPadding(new Insets(15));
+        navBar.setStyle("-fx-background-color: yellow;"); // Fond jaune
+
+        Button btnHome = creerBoutonNavigation("🏠");
+        Button btnCalendar = creerBoutonNavigation("📅");
+        Button btnCart = creerBoutonNavigation("🛒");
+        Button btnUser = creerBoutonNavigation("👤");
+
+        navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
+        root.setBottom(navBar);
+
+        // Scene
+        Scene scene = new Scene(root, 350, 550);
         stage.setTitle("Réservations - " + utilisateur.getPrenom());
         stage.setScene(scene);
         stage.show();
     }
-
-    private boolean showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setHeaderText(title);
-        alert.setContentText(message);
-        alert.showAndWait();
-        return alert.getResult() == ButtonType.OK;
-    }
 }
-
