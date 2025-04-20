@@ -1,16 +1,15 @@
 package controleur;
+
+import modele.dao.AttractionDAO;
+import modele.dao.ConnexionBDD;
+import vue.VueCalendrier;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
-
-import modele.dao.AttractionDAO;
-import modele.dao.ConnexionBDD;
-import vue.VueCalendrier;
-
-//constructeur compatible
 
 public class Calendrier {
     private VueCalendrier view;
@@ -23,14 +22,18 @@ public class Calendrier {
             Connection conn = ConnexionBDD.getConnexion(); // récupère la connexion
             this.attractionDAO = new AttractionDAO(conn);  // injection de la connexion
         } catch (SQLException | ClassNotFoundException | IOException e) {
-            e.printStackTrace(); // à remplacer par une vraie gestion d'erreurs si besoin
+            e.printStackTrace(); // à améliorer pour une meilleure UX si nécessaire
         }
     }
 
     public void initializeCalendar() {
         LocalDate today = LocalDate.now();
-        LocalDate endDate = today.plusYears(1);
         view.displayMonth(YearMonth.from(today));
+    }
+
+    public void navigateMonth(int months) {
+        YearMonth newMonth = view.getCurrentYearMonth().plusMonths(months);
+        view.displayMonth(newMonth);
     }
 
     public List<String> getAttractionsForDay(LocalDate date) {
@@ -38,7 +41,7 @@ public class Calendrier {
             return attractionDAO.getAllAttractionNames();
         } catch (SQLException e) {
             e.printStackTrace();
-            return List.of();
+            return List.of(); // retour vide en cas d’erreur
         }
     }
 }

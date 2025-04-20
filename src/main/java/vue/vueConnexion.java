@@ -17,9 +17,6 @@ import modele.dao.ConnexionBDD;
 
 import java.sql.Connection;
 
-
-//vueCo FX
-
 public class vueConnexion extends Application {
 
     @Override
@@ -73,14 +70,10 @@ public class vueConnexion extends Application {
                 if (utilisateur != null) {
                     messageLabel.setText("Connexion réussie !");
                     messageLabel.setTextFill(Color.GREEN);
-                    VueUtilisateur.afficherInfos(utilisateur, conn);
-                    // 👇 Lancement du calendrier avec l'utilisateur connecté
-                    javafx.application.Platform.runLater(() -> {
-                        primaryStage.close(); // ferme la fenêtre JavaFX
-                        javax.swing.SwingUtilities.invokeLater(() -> {
-                            new VueCalendrier(utilisateur).setVisible(true);
-                        });
-                    });
+
+                    // Changer de scène vers le calendrier JavaFX
+                    VueCalendrier vueCalendrier = new VueCalendrier(utilisateur);
+                    vueCalendrier.afficher(primaryStage);
 
                 } else {
                     messageLabel.setText("Identifiants incorrects.");
@@ -99,12 +92,10 @@ public class vueConnexion extends Application {
         navBar.setPadding(new Insets(15));
         navBar.setStyle("-fx-background-color: yellow;");
 
-        // Boutons de navigation
         Button btnHome = creerBoutonNavigation("🏠");
         Button btnCalendar = creerBoutonNavigation("📅");
         Button btnCart = creerBoutonNavigation("🛒");
         Button btnUser = creerBoutonNavigation("👤");
-
         navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
 
         // ===== Contenu central =====
@@ -120,7 +111,7 @@ public class vueConnexion extends Application {
         BorderPane root = new BorderPane();
         root.setCenter(centerBox);
         root.setBottom(navBar);
-        root.setStyle("-fx-background-color: #d0f5c8;"); // fond vert clair
+        root.setStyle("-fx-background-color: #d0f5c8;"); // fond vert clair Jurassic Park
 
         Scene scene = new Scene(root, 350, 550);
         primaryStage.setScene(scene);
@@ -134,7 +125,7 @@ public class vueConnexion extends Application {
                         "-fx-padding: 8;" +
                         "-fx-border-color: #bdc3c7;" +
                         "-fx-border-width: 1px;" +
-                        "-fx-background-color: #ff8f8f;" // fond rose comme dans l'image
+                        "-fx-background-color: #ff8f8f;" // rose inspiré de l'image JP
         );
         champ.setFont(Font.font("Arial", 14));
         champ.setMaxWidth(250);

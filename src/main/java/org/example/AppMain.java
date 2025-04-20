@@ -11,3 +11,11 @@ public class AppMain {
 
     }
 }
+
+/*
+lola.coignard@gmail.com
+triceratops
+
+pacome.golvet@edu.ece.fr
+Linette
+ */
