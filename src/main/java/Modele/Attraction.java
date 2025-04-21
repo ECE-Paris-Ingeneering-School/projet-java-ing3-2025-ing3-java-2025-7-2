@@ -28,6 +28,8 @@ public class Attraction {
         this.idAttraction = idAttraction;
     }
 
+    public int getId(){return idAttraction;}
+
     public String getNom() {
         return nom;
     }

@@ -1,5 +1,6 @@
 package modele;
 import java.util.Date;
+import modele.dao.AdminDAO;
 
 public class Admin {
 
@@ -38,4 +39,10 @@ public class Admin {
     public String toString() {
         return "id_Admin : " + id + " || " + nom + " " + prenom + " (" + mail + ")";
     }
+    public void modifierAttraction(Attraction a) {
+        AdminDAO dao = new AdminDAO();
+        dao.modifAttraction(a);
+    }
+
+
 }

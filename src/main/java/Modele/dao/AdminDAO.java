@@ -1,6 +1,7 @@
 package modele.dao;
 
 import modele.Admin;
+import modele.Attraction;
 
 import java.io.IOException;
 import java.sql.*;
@@ -33,4 +34,21 @@ public class AdminDAO {
 
         return admins;
     }
+
+    /// ajout / suppr client ?
+    /// ajout / suppr attractions / evenements ?
+
+    public void modifAttraction(Attraction attraction) {
+        try (Connection conn = ConnexionBDD.getConnexion()) {
+            String sql = "UPDATE attractions SET nom = ?, prix = ?, description = ? WHERE id = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, attraction.getNom());
+            stmt.setDouble(2, attraction.getPrix());
+            stmt.setInt(3, attraction.getId());
+            stmt.executeUpdate();
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            System.err.println("Erreur lors de la récupération des admins : " + e.getMessage());
+        }
+    }
+
 }

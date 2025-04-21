@@ -3,6 +3,12 @@ package org.example;
 import vue.vueConnexion;
 import javafx.application.Application;
 
+import modele.Admin;
+import modele.Utilisateur;
+import modele.Attraction;
+import controleur.AuthentificationService;
+import java.util.Scanner;
+
 public class AppMain {
     public static void main(String[] args) {
 
@@ -23,7 +29,6 @@ public class AppMain {
         for (modele.Admin a : admins) {
             System.out.println(a);
         }
-
 
 
         Application.launch(vueConnexion.class, args);  // Lancement JavaFX propre

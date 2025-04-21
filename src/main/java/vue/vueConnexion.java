@@ -17,6 +17,12 @@ import modele.dao.ConnexionBDD;
 
 import java.sql.Connection;
 
+
+import java.util.*;
+import modele.Attraction;
+import modele.dao.AttractionDAO;
+import modele.Admin;    ///POUR LES TESTS, à retirer
+
 public class vueConnexion extends Application {
 
     @Override
@@ -133,6 +139,41 @@ public class vueConnexion extends Application {
             Utilisateur utilisateur = auth.connecter(mail, motDePasse, conn);
 
             if (utilisateur != null) {
+                /// CONDITION SUIVANTE POUR TESTS, à retirer
+                if ("admin".equals(utilisateur.getRole())) {
+
+                    //int id, String mail, String mdp, String nom, String prenom
+                    Admin admin = new Admin(utilisateur.getId(),utilisateur.getEmail(),"",utilisateur.getNom(), utilisateur.getPrenom());
+
+                    Scanner scanner = new Scanner(System.in);
+
+                    AttractionDAO dao = new AttractionDAO(conn);
+                    List<Attraction> attractions = dao.getAllAttractions();  // à adapter selon ton DAO réel
+
+                    System.out.println("=== Liste des attractions ===");
+                    for (Attraction a : attractions) {
+                        System.out.println("ID: " + a.getIdAttraction() + " | Nom: " + a.getNom() + " | Prix: " + a.getPrix());
+                    }
+
+                    System.out.print("\nEntrez l’ID de l’attraction à modifier : ");
+                    int id = scanner.nextInt();
+                    scanner.nextLine();
+
+                    System.out.print("Nouveau nom : ");
+                    String nom = scanner.nextLine();
+
+                    System.out.print("Nouveau prix : ");
+                    double prix = scanner.nextDouble();
+                    scanner.nextLine();
+                    System.out.print("Nouvelle image (chemin ou URL) : ");
+                    String image = scanner.nextLine();
+
+                    Attraction a = new Attraction(id, nom, prix, image);
+                    admin.modifierAttraction(a);
+
+
+                    System.out.println("admin !!!");
+                }
                 messageLabel.setText("Connexion réussie !");
                 messageLabel.setTextFill(Color.GREEN);
 
@@ -152,6 +193,7 @@ public class vueConnexion extends Application {
     }
 
     public static void main(String[] args) {
+
         launch(args);
     }
 }
