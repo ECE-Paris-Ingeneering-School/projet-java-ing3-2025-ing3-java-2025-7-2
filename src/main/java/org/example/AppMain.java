@@ -6,7 +6,7 @@ import javafx.application.Application;
 import modele.Admin;
 import modele.Utilisateur;
 import modele.Attraction;
-import controleur.AuthentificationService;
+import modele.AuthentificationService;
 import java.util.Scanner;
 
 public class AppMain {

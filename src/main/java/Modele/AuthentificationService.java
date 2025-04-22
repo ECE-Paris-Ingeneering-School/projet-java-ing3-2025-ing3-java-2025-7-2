@@ -1,14 +1,12 @@
-package controleur;
+package modele;
 
 import modele.Utilisateur;
 import java.sql.*;
 
 public class AuthentificationService {
 
-    ///  A ETE DEPLACE VERS LE MODELE (ou la fct est sensee etre)
-
-/**
     public Utilisateur connecter(String mail, String motDePasse, Connection conn) {
+        System.out.println("je suis au bon endroit ! (test)");
         try {
             // Vérification dans la table admin
             Utilisateur utilisateur = verifier(conn, mail, motDePasse, "admin", "idAdmin", "admin");
@@ -28,6 +26,7 @@ public class AuthentificationService {
     }
 
     private Utilisateur verifier(Connection conn, String mail, String motDePasse, String table, String idField, String role) throws SQLException {
+        System.out.println("je suis au bon endroit ! (test 2)");
         String requete = "SELECT " + idField + ", nom, prenom, mail, motDePasse FROM " + table + " WHERE mail = ?";
         try (PreparedStatement stmt = conn.prepareStatement(requete)) {
             stmt.setString(1, mail);
@@ -50,5 +49,5 @@ public class AuthentificationService {
         }
 
         return null;
-    }**/
+    }
 }

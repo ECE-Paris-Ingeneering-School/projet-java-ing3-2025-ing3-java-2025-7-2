@@ -11,8 +11,12 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import modele.Utilisateur;
-import controleur.AuthentificationService;
+
+import controleur.ControleurConnexion;
+
+/// à disparaitre :
+/**import modele.Utilisateur;
+import controleur.AuthentificationService; //inexistant -> se trouve dans le modele maintenant
 import modele.dao.ConnexionBDD;
 
 import java.sql.Connection;
@@ -21,13 +25,18 @@ import java.sql.Connection;
 import java.util.*;
 import modele.Attraction;
 import modele.dao.AttractionDAO;
-import modele.Admin;    ///POUR LES TESTS, à retirer
+import modele.Admin;
+ **/    ///POUR LES TESTS, à retirer
 
 public class vueConnexion extends Application {
+
+    private ControleurConnexion controleur;
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Connexion");
+
+        controleur = new ControleurConnexion();
 
         // ===== Logo en haut à gauche =====
         Image logoImage = new Image(getClass().getResource("/images/logo_JP.png").toExternalForm());
@@ -63,12 +72,13 @@ public class vueConnexion extends Application {
                         "-fx-font-size: 14px;" +
                         "-fx-padding: 8 20 8 20;"
         );
-
-        loginButton.setOnAction(event -> connecter(emailField, passwordField, messageLabel, primaryStage));
+        /// modif de tous les "event->connecter" en "event->controleur.connecter" etc ...
+        loginButton.setOnAction(event -> controleur.connecter(emailField.getText(), passwordField.getText(), primaryStage, messageLabel));
 
         // ===== Ajout du gestionnaire d'événement pour "Entrée" =====
-        emailField.setOnAction(event -> connecter(emailField, passwordField, messageLabel, primaryStage));
-        passwordField.setOnAction(event -> connecter(emailField, passwordField, messageLabel, primaryStage));
+        emailField.setOnAction(event -> controleur.connecter(emailField.getText(), passwordField.getText(), primaryStage, messageLabel));
+
+        passwordField.setOnAction(event -> controleur.connecter(emailField.getText(), passwordField.getText(), primaryStage, messageLabel));
 
         // ===== Navigation style mobile =====
         HBox navBar = new HBox(15);
@@ -129,7 +139,7 @@ public class vueConnexion extends Application {
         return btn;
     }
 
-    private void connecter(TextField emailField, PasswordField passwordField, Label messageLabel, Stage primaryStage) {
+  /**  private void connecter(TextField emailField, PasswordField passwordField, Label messageLabel, Stage primaryStage) {
         String mail = emailField.getText();
         String motDePasse = passwordField.getText();
 
@@ -190,7 +200,7 @@ public class vueConnexion extends Application {
             messageLabel.setTextFill(Color.RED);
             e.printStackTrace();
         }
-    }
+    }**/
 
     public static void main(String[] args) {
 
