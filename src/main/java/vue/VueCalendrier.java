@@ -189,21 +189,16 @@ public class VueCalendrier {
             );
 
             reserveBtn.setOnAction(e -> {
-                if ("admin".equalsIgnoreCase(utilisateurConnecte.getRole())) {
-                    showAlert(Alert.AlertType.WARNING, "Accès refusé", "Les administrateurs ne peuvent pas réserver.");
-                    return;
-                }
+                String selected = attractionCombo.getValue();
 
-                try {
-                    String selected = attractionCombo.getValue();
-                    int idAttr = new AttractionDAO(ConnexionBDD.getConnexion()).getAttractionIdByName(selected);
-                    new ReservationDAO(ConnexionBDD.getConnexion()).ajouterReservation(utilisateurConnecte.getId(), idAttr, Date.valueOf(date));
+                boolean ok = controller.reserverAttraction(selected, date, utilisateurConnecte);
+                if (ok) {
                     showAlert(Alert.AlertType.INFORMATION, "Succès", "Réservation ajoutée pour " + selected);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la réservation.");
+                } else {
+                    showAlert(Alert.AlertType.WARNING, "Erreur", "Réservation impossible (rôle ou erreur BDD).");
                 }
             });
+
 
             reservationPanel.getChildren().addAll(
                     new Label("Attractions disponibles le " + date + " :"),

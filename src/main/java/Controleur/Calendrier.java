@@ -2,7 +2,11 @@ package controleur;
 
 import modele.dao.AttractionDAO;
 import modele.dao.ConnexionBDD;
+import modele.dao.ReservationDAO;
+
 import vue.VueCalendrier;
+
+import modele.Utilisateur;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -10,6 +14,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import java.sql.Date;
 
 public class Calendrier {
     private VueCalendrier view;
@@ -44,4 +49,24 @@ public class Calendrier {
             return List.of(); // retour vide en cas d’erreur
         }
     }
+
+    public boolean reserverAttraction(String nomAttraction, LocalDate date, Utilisateur utilisateur) {
+        if ("admin".equalsIgnoreCase(utilisateur.getRole())) {
+            return false; // Les admins ne réservent pas
+        }
+
+        try (Connection conn = ConnexionBDD.getConnexion()) {
+            AttractionDAO attractionDAO = new AttractionDAO(conn);
+            ReservationDAO reservationDAO = new ReservationDAO(conn);
+
+            int idAttraction = attractionDAO.getAttractionIdByName(nomAttraction);
+            reservationDAO.ajouterReservation(utilisateur.getId(), idAttraction, Date.valueOf(date));
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }
