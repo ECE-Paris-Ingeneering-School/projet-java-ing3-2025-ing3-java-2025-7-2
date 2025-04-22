@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+
 public class ReservationDAO {
 
     private Connection conn;
@@ -226,12 +230,58 @@ public class ReservationDAO {
         }
     }
 
+    public List<String> getReservationsDetailsParClientEtDatePassee(int idClient, Date today) {
+        List<String> reservations = new ArrayList<>();
+        String sql = "SELECT r.idReservation, r.dateAttraction, a.nom, a.prix FROM reservation r " +
+                "JOIN attraction a ON r.idAttraction = a.idAttraction " +
+                "WHERE r.idClient = ? AND r.dateAttraction <= ? ORDER BY r.dateAttraction DESC";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idClient);
+            stmt.setDate(2, today);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("idReservation");
+                String nom = rs.getString("nom");
+                Date date = rs.getDate("dateAttraction");
+                double prix = rs.getDouble("prix");
+                reservations.add("Attraction: " + nom + " (" + date + ") - Prix : " + prix + " €  # " + id);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return reservations;
+    }
 
 
+    public List<String> getReservationsDetailsParClientEtDateFuture(int idClient, Date today) {
+        List<String> reservations = new ArrayList<>();
+        String sql = "SELECT r.idReservation, r.dateAttraction, a.nom, a.prix FROM reservation r " +
+                "JOIN attraction a ON r.idAttraction = a.idAttraction " +
+                "WHERE r.idClient = ? AND r.dateAttraction > ? ORDER BY r.dateAttraction ASC";
 
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idClient);
+            stmt.setDate(2, today);
 
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("idReservation");
+                String nom = rs.getString("nom");
+                Date date = rs.getDate("dateAttraction");
+                double prix = rs.getDouble("prix");
+                reservations.add("Attraction: " + nom + " (" + date + ") - Prix : " + prix + " €  # " + id);
+            }
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
+        return reservations;
+    }
 
 
 }
