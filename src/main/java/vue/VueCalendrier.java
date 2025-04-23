@@ -179,7 +179,14 @@ public class VueCalendrier {
             LocalDate date = yearMonth.atDay(day);
             Button dayBtn = new Button(String.valueOf(day));
             dayBtn.setMaxWidth(Double.MAX_VALUE);
-            dayBtn.setOnAction(e -> showDayAttractions(date));
+
+            if (date.isBefore(LocalDate.now())) {
+                dayBtn.setDisable(true);
+                dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: darkgray;");
+            } else {
+                dayBtn.setOnAction(e -> showDayAttractions(date));
+            }
+
             calendarGrid.add(dayBtn, col, row);
 
             col++;
@@ -217,12 +224,18 @@ public class VueCalendrier {
             reserveBtn.setOnAction(e -> {
                 String selected = attractionCombo.getValue();
 
-                boolean ok = controller.reserverAttraction(selected, date, utilisateurConnecte);
-                if (ok) {
-                    showAlert(Alert.AlertType.INFORMATION, "Succès", "Réservation ajoutée pour " + selected);
-                } else {
-                    showAlert(Alert.AlertType.WARNING, "Erreur", "Réservation impossible (rôle ou erreur BDD).");
+                if(date.isBefore(LocalDate.now())) {
+                    showAlert(Alert.AlertType.WARNING,"Erreur","Cette date est dépassée");
                 }
+                else{
+                    boolean ok = controller.reserverAttraction(selected, date, utilisateurConnecte);
+                    if (ok) {
+                        showAlert(Alert.AlertType.INFORMATION, "Succès", "Réservation ajoutée pour " + selected);
+                    } else {
+                        showAlert(Alert.AlertType.WARNING, "Erreur", "Réservation impossible (rôle ou erreur BDD).");
+                    }
+                }
+
             });
 
 

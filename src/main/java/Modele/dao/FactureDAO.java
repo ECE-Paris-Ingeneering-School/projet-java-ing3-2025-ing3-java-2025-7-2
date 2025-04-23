@@ -39,9 +39,10 @@ public class FactureDAO {
         if (age < 12 || age > 60) {
             reduction += 0.15;
         }
-        reduction += reservationsDansLeMois * 0.10;
-        reduction = Math.min(reduction, 0.30);
 
+        if(reservationsDansLeMois>1 && reservationsDansLeMois<=4) {
+            reduction+=((reservationsDansLeMois-1)*0.1);
+        }
         double prixFinal = total * (1 - reduction);
 
         System.out.println("Connexion OK ? " + (connexion != null));
