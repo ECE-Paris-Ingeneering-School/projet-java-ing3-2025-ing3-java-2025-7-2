@@ -103,6 +103,26 @@ public class VueCalendrier {
 
         navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
 
+        ///  RAFRAICHISSEMENT APGE
+        btnCalendar.setOnAction(e -> {
+            this.afficher(new Stage());  // relance la page actuelle
+            stage.close();
+        });
+        //parcours icone du bas
+        btnUser.setOnAction(e -> {
+            try {
+                if ("client".equalsIgnoreCase(utilisateurConnecte.getRole())) {
+                    VueClient.afficher(new Stage(), utilisateurConnecte);
+                }
+                else if ("admin".equalsIgnoreCase(utilisateurConnecte.getRole())) {
+                    /// VueAdmin a implémenter
+                }
+                stage.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
         // ===== Placement dans BorderPane =====
         root.setCenter(centerContent);
         root.setBottom(navBar);
