@@ -115,7 +115,7 @@ public class VueCalendrier {
                     VueClient.afficher(new Stage(), utilisateurConnecte);
                 }
                 else if ("admin".equalsIgnoreCase(utilisateurConnecte.getRole())) {
-                    /// VueAdmin a implémenter
+                    VueAdmin.afficher(new Stage(), utilisateurConnecte);
                 }
                 stage.close();
             } catch (Exception ex) {
