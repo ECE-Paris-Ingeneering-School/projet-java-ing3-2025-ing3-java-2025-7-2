@@ -2,32 +2,33 @@
 package vue;
 
 import controleur.ControleurReservations;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import controleur.ControleurFactures;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import modele.Utilisateur;
 
-import java.time.LocalDate;
+import java.sql.Connection;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class VueReservations {
 
     private final Utilisateur utilisateur;
+    private final Connection connexion;
     private VBox contentBox;
     private final ControleurReservations controller;
+    private final ControleurFactures controleurFactures;
 
-    public VueReservations(Utilisateur utilisateur) {
+    public VueReservations(Utilisateur utilisateur, Connection connexion) {
         this.utilisateur = utilisateur;
+        this.connexion = connexion;
         this.controller = new ControleurReservations();
+        this.controleurFactures = new ControleurFactures(connexion);
     }
 
     private Button creerBoutonNavigation(String emoji) {
@@ -94,13 +95,17 @@ public class VueReservations {
             confirmer.setStyle("-fx-background-color:#e74c3c; -fx-text-fill:white; -fx-font-size:14px; -fx-padding:8 20 8 20;");
             confirmer.setOnAction(e -> {
                 try {
-                    Integer idFacture = controller.genererFacture(utilisateur);
-                    if (idFacture != null && showAlert(Alert.AlertType.INFORMATION, "Facture", "Facture générée avec succès !")) {
-                        afficherFacture(idFacture);
+                    System.out.println("Tentative de génération  facture ");
+
+                    Integer idFacture = controleurFactures.genererFacture(utilisateur);
+                    if (idFacture != null && idFacture > 0) {
+                        showAlert(Alert.AlertType.INFORMATION, "Facture", "Facture générée avec succès ! ID : " + idFacture);
+                    } else {
+                        showAlert(Alert.AlertType.WARNING, "Aucune facture", "Aucune réservation facturable trouvée.");
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la génération.");
+                    showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la génération de la facture.");
                 }
             });
             contentBox.getChildren().add(confirmer);
@@ -147,9 +152,7 @@ public class VueReservations {
         del.setStyle("-fx-background-color:#c0392b; -fx-text-fill:white; -fx-font-size:12px;");
         del.setOnAction(e -> {
             try {
-                /// probleme recuperation texte pcq id de res pas stocké => plante facile
-
-                Pattern pattern = Pattern.compile("#\\s*(\\d+)$");  // cherche num juste après "#"
+                Pattern pattern = Pattern.compile("#\\s*(\\d+)$");
                 Matcher matcher = pattern.matcher(res);
 
                 if (matcher.find()) {
@@ -169,9 +172,5 @@ public class VueReservations {
 
         ligne.getChildren().addAll(lbl, del);
         contentBox.getChildren().add(ligne);
-    }
-
-    private void afficherFacture(int idFacture) {
-        // inchangé : contenu existant de la méthode afficherFacture
     }
 }

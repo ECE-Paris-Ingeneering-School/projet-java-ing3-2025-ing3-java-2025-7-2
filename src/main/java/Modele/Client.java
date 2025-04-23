@@ -49,4 +49,27 @@ public class Client {
     /*public int getAge{
         //...
     }*/
+    public int getAge() {
+        System.out.println("entrée fct getAge");
+        if (datedeNaissance == null) {
+            System.err.println("[ERREUR] Date de naissance est null pour le client id = " + id);
+            throw new IllegalStateException("Date de naissance manquante");
+        }
+
+        try {
+            // Forcer la conversion en SQL Date puis LocalDate
+            LocalDate birth = ((java.sql.Date) datedeNaissance).toLocalDate();
+            System.out.println("sortie 'fonctionnelle' fct getAge");
+
+            return Period.between(birth, LocalDate.now()).getYears();
+
+        } catch (Exception e) {
+            System.err.println("[ERREUR] Échec du calcul de l’âge pour client id = " + id);
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+
+
 }

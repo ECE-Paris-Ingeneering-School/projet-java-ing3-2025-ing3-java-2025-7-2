@@ -284,5 +284,29 @@ public class ReservationDAO {
         return reservations;
     }
 
+    public List<Object[]> getReservationsPasseesPourFacturation(int idClient) {
+        List<Object[]> reservations = new ArrayList<>();
+        String sql = "SELECT r.idReservation, a.nom, r.dateAttraction, a.prix FROM reservation r " +
+                "JOIN attraction a ON r.idAttraction = a.idAttraction " +
+                "WHERE r.idClient = ? AND r.dateAttraction <= CURDATE() AND r.idFacture = 0";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idClient);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Object[] ligne = new Object[4];
+                ligne[0] = rs.getInt("idReservation");
+                ligne[1] = rs.getString("nom");
+                ligne[2] = rs.getDate("dateAttraction");
+                ligne[3] = rs.getDouble("prix");
+                reservations.add(ligne);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return reservations;
+    }
 
 }

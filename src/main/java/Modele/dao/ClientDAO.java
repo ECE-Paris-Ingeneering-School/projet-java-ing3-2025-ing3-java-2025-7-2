@@ -39,4 +39,29 @@ public class ClientDAO {
 
         return liste_clients;
     }
+
+    public Client getClientParId(int idClient) throws SQLException, IOException, ClassNotFoundException {
+        Client client = null;
+        String sql = "SELECT * FROM client WHERE idClient = ?";
+
+        try (Connection conn = ConnexionBDD.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idClient);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String mail = rs.getString("mail");
+                    String mdp = rs.getString("motDePasse");
+                    String nom = rs.getString("nom");
+                    String prenom = rs.getString("prenom");
+                    Date dateNaissance = rs.getDate("datedeNaissance");
+
+                    client = new Client(idClient, mail, mdp, nom, prenom, dateNaissance, 0);
+                }
+            }
+        }
+
+        return client;
+    }
+
 }

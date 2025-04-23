@@ -82,9 +82,15 @@ public class VueCalendrier {
                         "-fx-padding: 8 20 8 20;"
         );
         voirReservationsBtn.setOnAction(e -> {
-            VueReservations vueRes = new VueReservations(utilisateurConnecte);
-            vueRes.afficher(new Stage());
+            try {
+                VueReservations vueRes = new VueReservations(utilisateurConnecte, ConnexionBDD.getConnexion());
+                vueRes.afficher(new Stage());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible d’ouvrir les réservations.");
+            }
         });
+
 
         VBox centerContent = new VBox(10, topPanel, calendarScroll, reservationPanel, voirReservationsBtn);
         centerContent.setAlignment(Pos.TOP_CENTER);
