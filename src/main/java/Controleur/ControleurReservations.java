@@ -25,6 +25,8 @@ public class ControleurReservations {
     }
 
     public boolean supprimerReservation(int idReservation) {
+        System.out.println("debug du suppr, id reservation: " + idReservation);
+
         try (Connection conn = ConnexionBDD.getConnexion()) {
             ReservationDAO dao = new ReservationDAO(conn);
             dao.supprimerReservation(idReservation);

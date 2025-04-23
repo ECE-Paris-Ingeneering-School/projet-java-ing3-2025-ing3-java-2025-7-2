@@ -29,6 +29,7 @@ public class ReservationDAO {
 
 
     public void supprimerReservation(int idReservation) throws SQLException {
+        System.out.println("debug du suppr, id reservation: " + idReservation);
         String sql = "DELETE FROM reservation WHERE idReservation = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idReservation);

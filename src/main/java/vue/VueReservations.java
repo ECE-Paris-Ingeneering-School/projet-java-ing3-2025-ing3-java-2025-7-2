@@ -147,11 +147,21 @@ public class VueReservations {
         del.setStyle("-fx-background-color:#c0392b; -fx-text-fill:white; -fx-font-size:12px;");
         del.setOnAction(e -> {
             try {
-                int idRes = Integer.parseInt(res.split("#")[1].split(" ")[0]);
-                controller.supprimerReservation(idRes);
-                showAlert(Alert.AlertType.INFORMATION, "Suppression", "Réservation supprimée.");
-                this.afficher(new Stage());
-                stage.close();
+                /// probleme recuperation texte pcq id de res pas stocké => plante facile
+
+                Pattern pattern = Pattern.compile("#\\s*(\\d+)$");  // cherche num juste après "#"
+                Matcher matcher = pattern.matcher(res);
+
+                if (matcher.find()) {
+                    int idRes = Integer.parseInt(matcher.group(1));
+                    controller.supprimerReservation(idRes);
+                    showAlert(Alert.AlertType.INFORMATION, "Suppression", "Réservation supprimée.");
+                    this.afficher(new Stage());
+                    stage.close();
+                } else {
+                    System.err.println("[Erreur] Impossible de trouver l'id de réservation dans : " + res);
+                }
+
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

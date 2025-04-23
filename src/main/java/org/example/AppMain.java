@@ -14,7 +14,7 @@ public class AppMain {
 
 
         /// AFFICHAGE CONSOLE LISTES CLIENTS ET ADMINS (pr tester)
-        modele.dao.ClientDAO clientDAO = new modele.dao.ClientDAO();
+        /**modele.dao.ClientDAO clientDAO = new modele.dao.ClientDAO();
         java.util.List<modele.Client> clients = clientDAO.getAllClients();
 
         System.out.println("Affichage console de la liste des clients :");
@@ -28,7 +28,7 @@ public class AppMain {
         System.out.println("Affichage console de la liste des admins :");
         for (modele.Admin a : admins) {
             System.out.println(a);
-        }
+        }**/
 
 
         Application.launch(vueConnexion.class, args);  // Lancement JavaFX propre
