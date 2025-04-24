@@ -13,6 +13,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import controleur.ControleurConnexion;
+import modele.Utilisateur;
 
 /// à disparaitre :
 /**import modele.Utilisateur;
@@ -72,13 +73,20 @@ public class vueConnexion extends Application {
                         "-fx-font-size: 14px;" +
                         "-fx-padding: 8 20 8 20;"
         );
+        Button signupButton = new Button("S'inscrire");
+        signupButton.setStyle(
+                "-fx-background-color: #2ecc71;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-padding: 8 20 8 20;"
+        );
+
         /// modif de tous les "event->connecter" en "event->controleur.connecter" etc ...
-        loginButton.setOnAction(event -> controleur.connecter(emailField.getText(), passwordField.getText(), primaryStage, messageLabel));
-
-        // ===== Ajout du gestionnaire d'événement pour "Entrée" =====
-        emailField.setOnAction(event -> controleur.connecter(emailField.getText(), passwordField.getText(), primaryStage, messageLabel));
-
-        passwordField.setOnAction(event -> controleur.connecter(emailField.getText(), passwordField.getText(), primaryStage, messageLabel));
+        loginButton.setOnAction(event -> gererConnexion(emailField.getText(), passwordField.getText(), primaryStage, messageLabel));
+        emailField.setOnAction(event -> gererConnexion(emailField.getText(), passwordField.getText(), primaryStage, messageLabel));
+        passwordField.setOnAction(event -> gererConnexion(emailField.getText(), passwordField.getText(), primaryStage, messageLabel));
+        signupButton.setOnAction(event -> afficherInscription(primaryStage));
 
         // ===== Navigation style mobile =====
         HBox navBar = new HBox(15);
@@ -93,7 +101,7 @@ public class vueConnexion extends Application {
         navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
 
         // ===== Contenu central =====
-        VBox contenu = new VBox(15, titreLabel, emailField, passwordField, loginButton, messageLabel);
+        VBox contenu = new VBox(15, titreLabel, emailField, passwordField, loginButton,signupButton, messageLabel);
         contenu.setAlignment(Pos.CENTER);
         contenu.setPadding(new Insets(10));
 
@@ -206,4 +214,22 @@ public class vueConnexion extends Application {
 
         launch(args);
     }
+    private void gererConnexion(String email, String mdp, Stage stage, Label messageLabel) {
+        Utilisateur utilisateur = controleur.connecter(email, mdp);
+
+        if (utilisateur != null) {
+            messageLabel.setText("Connexion réussie !");
+            messageLabel.setStyle("-fx-text-fill: green;");
+            VueCalendrier vueCalendrier = new VueCalendrier(utilisateur);
+            vueCalendrier.afficher(stage);
+        } else {
+            messageLabel.setText("Identifiants incorrects");
+            messageLabel.setStyle("-fx-text-fill: red;");
+        }
+    }
+    private void afficherInscription(Stage primaryStage) {
+        VueInscription vueInscription = new VueInscription();
+        vueInscription.afficher(primaryStage);
+    }
+
 }
