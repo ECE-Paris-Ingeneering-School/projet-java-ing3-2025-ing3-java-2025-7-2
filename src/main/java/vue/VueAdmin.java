@@ -1,5 +1,6 @@
 package vue;
 
+import controleur.ControleurFactures;
 import controleur.ControleurUtilisateur;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import modele.Utilisateur;
+import modele.dao.ConnexionBDD;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -66,6 +68,9 @@ public class VueAdmin {
 
        btnAttractions.setOnAction(e -> {
            try {    /// bizarre que la connection me force du throw ou try catch => à vérif
+                    /// ==> On a un try catch dans ClientDAO pcq une seule méthode,
+                    /// on n'a pas mis de try catch dans AttractionsDAO pcq plusieurs méthodes,
+                    /// et donc, ca a l'air de se repercuter dans le controleur et la vue
                VueAdminAttractions.afficher(new Stage(), utilisateur);
            } catch (SQLException ex) {
                throw new RuntimeException(ex);
@@ -103,6 +108,18 @@ public class VueAdmin {
             VueCalendrier vueCal = new VueCalendrier(utilisateur);
             vueCal.afficher(new Stage());
             stage.close();
+        });
+        btnCart.setOnAction(e ->{   /// Un peu inutile vu que l'admin n'a ni reservations ni factures mais bon
+            try {
+                ControleurFactures controleurFactures = new ControleurFactures(ConnexionBDD.getConnexion()); // adapte si c’est déjà instancié ailleurs
+                new VueFactures(controleurFactures, utilisateur); // ouvre la vue des factures
+                ///stage.close();
+                /// ==> Fenêtre sans barre de navigation donc on la laisse en popup jusqu'à implémentation
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
         });
 
         navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);

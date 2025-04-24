@@ -3,6 +3,7 @@ package modele.dao;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FactureDAO {
@@ -82,4 +83,26 @@ public class FactureDAO {
             return null;
         }
     }
+
+    public List<Object[]> getFacturesDuClientSousFormeListe(int idClient) {
+        List<Object[]> factures = new ArrayList<>();
+        try {
+            String sql = "SELECT * FROM facture WHERE idClient = ?";
+            PreparedStatement ps = connexion.prepareStatement(sql);
+            ps.setInt(1, idClient);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int idFacture = rs.getInt("idFacture");
+                Date dateFacture = rs.getDate("dateFacture");
+                double prix = rs.getDouble("prix");
+                factures.add(new Object[]{idFacture, dateFacture, prix});
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return factures;
+    }
+
 }

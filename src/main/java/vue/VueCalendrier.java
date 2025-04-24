@@ -1,6 +1,7 @@
 package vue;
 
 import controleur.Calendrier;
+import controleur.ControleurFactures;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -127,6 +128,17 @@ public class VueCalendrier {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+        });
+        btnCart.setOnAction(e ->{
+            try {
+                ControleurFactures controleurFactures = new ControleurFactures(ConnexionBDD.getConnexion()); // adapte si c’est déjà instancié ailleurs
+                new VueFactures(controleurFactures, utilisateurConnecte); // ouvre la vue des factures
+               /// stage.close()
+                /// ==> Fenêtre sans barre de navigation donc on la laisse en popup jusqu'à implémentation
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
         });
 
         // ===== Placement dans BorderPane =====

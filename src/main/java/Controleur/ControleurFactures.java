@@ -6,7 +6,12 @@ import modele.dao.ClientDAO;
 import modele.dao.FactureDAO;
 import modele.dao.ReservationDAO;
 
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ControleurFactures {
@@ -32,4 +37,11 @@ public class ControleurFactures {
         System.out.println("Tentative de génération  facture - controleur pre return -");
         return factureDAO.genererFacture(client.getId(), age, reservations);
     }
+
+    public List<Object[]> getFacturesDuClient(Utilisateur utilisateur) throws SQLException, IOException, ClassNotFoundException {
+        Client client = clientDAO.getClientParId(utilisateur.getId());
+        return factureDAO.getFacturesDuClientSousFormeListe(client.getId());
+    }
+
+
 }
