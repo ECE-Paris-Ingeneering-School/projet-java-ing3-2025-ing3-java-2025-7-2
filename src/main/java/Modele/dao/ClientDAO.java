@@ -64,4 +64,44 @@ public class ClientDAO {
         return client;
     }
 
+    public void ajouterClient(Client client) throws Exception {
+        try (Connection conn = ConnexionBDD.getConnexion()) {
+            String sql = "INSERT INTO client (mail, motDePasse, nom, prenom, datedeNaissance) VALUES (?, ?, ?, ?, ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, client.getMail());
+                stmt.setString(2, client.getMdp());
+                stmt.setString(3, client.getNom());
+                stmt.setString(4, client.getPrenom());
+                stmt.setDate(5, new java.sql.Date(client.getDatedeNaissance().getTime()));
+                stmt.executeUpdate();
+            }
+        }
+    }
+
+    public void modifierClient(Client client) throws Exception {
+        try (Connection conn = ConnexionBDD.getConnexion()) {
+            String sql = "UPDATE client SET mail=?, motDePasse=?, nom=?, prenom=?, datedeNaissance=? WHERE idClient=?";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, client.getMail());
+                stmt.setString(2, client.getMdp());
+                stmt.setString(3, client.getNom());
+                stmt.setString(4, client.getPrenom());
+                stmt.setDate(5, new java.sql.Date(client.getDatedeNaissance().getTime()));
+                stmt.setInt(6, client.getId());
+                stmt.executeUpdate();
+            }
+        }
+    }
+
+    public void supprimerClient(int idClient) throws Exception {
+        try (Connection conn = ConnexionBDD.getConnexion()) {
+            String sql = "DELETE FROM client WHERE idClient = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, idClient);
+                stmt.executeUpdate();
+            }
+        }
+    }
+
+
 }

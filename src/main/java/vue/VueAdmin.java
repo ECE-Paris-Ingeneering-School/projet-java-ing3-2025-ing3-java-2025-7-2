@@ -12,6 +12,9 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import modele.Utilisateur;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 public class VueAdmin {
 
     public static void afficher(Stage stage, Utilisateur utilisateur) {
@@ -42,10 +45,48 @@ public class VueAdmin {
         emailLabel.setStyle("-fx-font-size: 14px;");
         roleLabel.setStyle("-fx-font-size: 14px;");
 
-        contentBox.getChildren().addAll(titre, emailLabel, roleLabel);
+        /// ____________modifs dispo aux admins :
+        VBox menuAdmin = new VBox(10);
+        menuAdmin.setAlignment(Pos.CENTER);
+
+        Button btnAttractions = new Button("🎢 Attractions");
+        Button btnClients = new Button("👥 Clients");
+        Button btnEvenements = new Button("🎉 Événements");
+        Button btnFactures = new Button("÷ Factures");
+        Button btnReservations = new Button("📆 Réservations");
+
+        for (Button btn : new Button[]{btnAttractions, btnClients, btnEvenements, btnFactures, btnReservations}) {
+            btn.setPrefWidth(200);
+            btn.setStyle("-fx-font-size: 14px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 10;");
+        }
+
+        menuAdmin.getChildren().addAll(btnAttractions, btnClients, btnEvenements, btnFactures, btnReservations);
+
+        contentBox.getChildren().addAll(titre, emailLabel, roleLabel, menuAdmin);
+
+       btnAttractions.setOnAction(e -> {
+           try {    /// bizarre que la connection me force du throw ou try catch => à vérif
+               VueAdminAttractions.afficher(new Stage(), utilisateur);
+           } catch (SQLException ex) {
+               throw new RuntimeException(ex);
+           } catch (IOException ex) {
+               throw new RuntimeException(ex);
+           } catch (ClassNotFoundException ex) {
+               throw new RuntimeException(ex);
+           }
+           //stage.close();
+           /// si on close pas, ouverture nouvelle fenetre, pas necessaire de rajouter de la navigation
+        });
+
+        btnClients.setOnAction(e -> {
+            VueAdminClients.afficher(new Stage(), utilisateur);     ///pas de catch ici, code AdminAttraction à revoir dans le controleur et la vue
+        });
+
+
 
         VBox mainLayout = new VBox(logoBox, contentBox);
         mainLayout.setStyle("-fx-background-color: #d0f5c8;");
+
 
         // ===== Barre de navigation en bas =====
         HBox navBar = new HBox(15);
