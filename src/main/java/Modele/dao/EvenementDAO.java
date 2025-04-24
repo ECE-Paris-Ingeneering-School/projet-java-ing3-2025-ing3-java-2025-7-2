@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EvenementDAO {
-    private Connection conn;
+    private static Connection conn;
 
     public EvenementDAO(Connection conn) {
         this.conn = conn;
@@ -91,7 +91,7 @@ public class EvenementDAO {
     }
 
     // Récupérer tous les événements
-    public List<Evenement> getAllEvenements() throws SQLException {
+    public static List<Evenement> getAllEvenements() throws SQLException {
         List<Evenement> evenements = new ArrayList<>();
         String sql = "SELECT * FROM evenement";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -127,6 +127,43 @@ public class EvenementDAO {
         }
         return null; // Aucun événement trouvé
     }
+
+
+    public Evenement getEvenementParDate(LocalDate date) {
+        String sql = "SELECT * FROM evenement WHERE dateDebut <= ? AND dateFin >= ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            java.sql.Date sqlDate = java.sql.Date.valueOf(date);
+
+            stmt.setDate(1, sqlDate); // dateDebut <= date
+            stmt.setDate(2, sqlDate); // dateFin >= date
+
+            System.out.println("→ Vérification requête pour date : " + sqlDate); // DEBUG
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Evenement evt = new Evenement();
+                evt.setIdEvenement(rs.getInt("idEvenement"));
+                evt.setNom(rs.getString("nom"));
+                evt.setSupplement(rs.getDouble("supplement"));
+                evt.setDateDebut(rs.getDate("dateDebut"));
+                evt.setDateFin(rs.getDate("dateFin"));
+
+                System.out.println("✅ Événement trouvé : " + evt.getNom() + " | Supplément : " + evt.getSupplement());
+                return evt;
+            } else {
+                System.out.println("❌ Aucun événement pour cette date.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erreur SQL : " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 
 
 }

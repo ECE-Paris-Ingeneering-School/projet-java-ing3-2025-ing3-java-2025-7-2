@@ -1,6 +1,7 @@
 package vue;
 
 import controleur.Calendrier;
+import controleur.ControleurEvenement;
 import controleur.ControleurFactures;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,6 +16,7 @@ import modele.dao.ConnexionBDD;
 import modele.dao.ReservationDAO;
 
 import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
@@ -30,10 +32,12 @@ public class VueCalendrier {
     private VBox reservationPanel;
     private Utilisateur utilisateurConnecte;
     private Stage stage;
+    private ControleurEvenement controleurEvenement;
 
     public VueCalendrier(Utilisateur utilisateur) {
         this.utilisateurConnecte = utilisateur;
         this.controller = new Calendrier(this);
+        this.controleurEvenement = new ControleurEvenement();
     }
 
     public void afficher(Stage stage) {
@@ -187,14 +191,77 @@ public class VueCalendrier {
         int row = 1;
         int col = startDayOfWeek - 1;
 
+        List<LocalDate> joursEvenements = controleurEvenement.getDatesAvecEvenements(yearMonth);
+
         for (int day = 1; day <= yearMonth.lengthOfMonth(); day++) {
             LocalDate date = yearMonth.atDay(day);
             Button dayBtn = new Button(String.valueOf(day));
             dayBtn.setMaxWidth(Double.MAX_VALUE);
 
+            if (joursEvenements.contains(date)) {
+                //System.out.println(date);
+                if(controleurEvenement.getIDEvenementParDate(date) == 1){
+                    dayBtn.setStyle("-fx-background-color: #ff0000; -fx-text-fill: white;");
+                }
+                else if(controleurEvenement.getIDEvenementParDate(date) == 2){
+                    dayBtn.setStyle("-fx-background-color: #11ff00; -fx-text-fill: white;");
+                }
+
+                else if(controleurEvenement.getIDEvenementParDate(date) == 3){
+                    dayBtn.setStyle("-fx-background-color:  #fd7200; -fx-text-fill: white;");
+                }
+
+                else if(controleurEvenement.getIDEvenementParDate(date) == 4){
+                    dayBtn.setStyle("-fx-background-color: #00ffd9; -fx-text-fill: white;");
+                }
+
+                else if(controleurEvenement.getIDEvenementParDate(date) == 5){
+                    dayBtn.setStyle("-fx-background-color: #ff00dd; -fx-text-fill: white;");
+                }
+
+                else if(controleurEvenement.getIDEvenementParDate(date) == 6){
+                    dayBtn.setStyle("-fx-background-color: #002aff; -fx-text-fill: white;");
+                }
+                else{
+                    dayBtn.setStyle("-fx-background-color: orange; -fx-text-fill: white;");
+
+                }
+
+            }
+
             if (date.isBefore(LocalDate.now())) {
                 dayBtn.setDisable(true);
                 dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: darkgray;");
+                if (joursEvenements.contains(date)) {
+                    //System.out.println(date);
+                    if(controleurEvenement.getIDEvenementParDate(date) == 1){
+                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: #ff0000;");
+                    }
+                    else if(controleurEvenement.getIDEvenementParDate(date) == 2){
+                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: #11ff00;");
+                    }
+
+                    else if(controleurEvenement.getIDEvenementParDate(date) == 3){
+                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: #fd7200;");
+                    }
+
+                    else if(controleurEvenement.getIDEvenementParDate(date) == 4){
+                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: #00ffd9;");
+                    }
+
+                    else if(controleurEvenement.getIDEvenementParDate(date) == 5){
+                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: #ff00dd;");
+                    }
+
+                    else if(controleurEvenement.getIDEvenementParDate(date) == 6){
+                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: #002aff;");
+                    }
+                    else{
+                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: orange;");
+
+                    }
+
+                }
             } else {
                 dayBtn.setOnAction(e -> showDayAttractions(date));
             }
@@ -208,6 +275,7 @@ public class VueCalendrier {
             }
         }
     }
+
 
     private void navigateMonth(int delta) {
         displayMonth(currentYearMonth.plusMonths(delta));

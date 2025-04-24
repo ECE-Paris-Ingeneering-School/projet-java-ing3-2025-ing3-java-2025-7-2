@@ -1,7 +1,10 @@
 package modele.dao;
 
+import modele.Evenement;
+
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -241,13 +244,25 @@ public class ReservationDAO {
             stmt.setInt(1, idClient);
             stmt.setDate(2, today);
 
+            EvenementDAO evenementDAO = new EvenementDAO(ConnexionBDD.getConnexion());
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("idReservation");
                 String nom = rs.getString("nom");
                 Date date = rs.getDate("dateAttraction");
-                double prix = rs.getDouble("prix");
-                reservations.add("Attraction: " + nom + " (" + date + ") - Prix : " + prix + " €  # " + id);
+                double prixBase = rs.getDouble("prix");
+
+                // Convertir en LocalDate
+                LocalDate localDate = date.toLocalDate();
+
+                // Récupérer l'événement (s’il y en a un) pour cette date
+                Evenement evt = evenementDAO.getEvenementParDate(localDate);
+                // Calcul du prix final avec supplément
+                double prixFinal = prixBase;
+                if (evt != null) {
+                    prixFinal += evt.getSupplement();
+                }
+
             }
 
         } catch (Exception e) {
@@ -256,6 +271,7 @@ public class ReservationDAO {
 
         return reservations;
     }
+
 
 
     public List<String> getReservationsDetailsParClientEtDateFuture(int idClient, Date today) {
@@ -268,13 +284,24 @@ public class ReservationDAO {
             stmt.setInt(1, idClient);
             stmt.setDate(2, today);
 
+
+            EvenementDAO evenementDAO = new EvenementDAO(ConnexionBDD.getConnexion());
             ResultSet rs = stmt.executeQuery();
+
             while (rs.next()) {
                 int id = rs.getInt("idReservation");
                 String nom = rs.getString("nom");
                 Date date = rs.getDate("dateAttraction");
                 double prix = rs.getDouble("prix");
-                reservations.add("Attraction: " + nom + " (" + date + ") - Prix : " + prix + " €  # " + id);
+                LocalDate localDate = date.toLocalDate();
+
+                Evenement evt = evenementDAO.getEvenementParDate(localDate);
+                double prixFinal = prix;
+                if (evt != null) {
+                    prixFinal += evt.getSupplement();
+                }
+
+                reservations.add("Attraction: " + nom + " (" + date + ") - Prix : " + prixFinal + " €  # " + id);
             }
 
         } catch (Exception e) {

@@ -42,6 +42,7 @@ public class Evenement {
         this.dateDebut = dateDebut;
     }
 
+
     public void setDateFin(Date dateFin) {
         this.dateFin = dateFin;
     }
