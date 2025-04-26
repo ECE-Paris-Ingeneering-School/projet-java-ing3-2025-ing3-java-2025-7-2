@@ -6,6 +6,7 @@ public class Attraction {
     private String nom;
     private double prix;
     private String image;
+    private int nombreReservations;
 
     // Constructeur sans paramètres
     public Attraction() {
@@ -17,6 +18,7 @@ public class Attraction {
         this.nom = nom;
         this.prix = prix;
         this.image = image;
+        this.nombreReservations = 0;
     }
 
     // Getters et Setters
@@ -54,7 +56,14 @@ public class Attraction {
         this.image = image;
     }
 
-    // Méthode toString() pour afficher les informations de l'attraction
+    public int getNombreReservations() {
+        return nombreReservations;
+    }
+    public void setNombreReservations(int nombreReservations) {
+        this.nombreReservations = nombreReservations;
+    }
+
+
     @Override
     public String toString() {
         return "Attraction{" +

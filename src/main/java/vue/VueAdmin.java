@@ -1,6 +1,7 @@
 package vue;
 
 import controleur.ControleurFactures;
+import controleur.ControleurReporting;
 import controleur.ControleurUtilisateur;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import modele.Utilisateur;
+import modele.dao.AttractionDAO;
 import modele.dao.ConnexionBDD;
 
 import java.io.IOException;
@@ -56,13 +58,15 @@ public class VueAdmin {
         Button btnEvenements = new Button("🎉 Événements");
         Button btnFactures = new Button("÷ Factures");
         Button btnReservations = new Button("📆 Réservations");
+        Button btnReporting = new Button("\uD83D\uDCF6 Statistiques");
 
-        for (Button btn : new Button[]{btnAttractions, btnClients, btnEvenements, btnFactures, btnReservations}) {
+
+        for (Button btn : new Button[]{btnAttractions,btnClients, btnEvenements, btnFactures, btnReservations,btnReporting}) {
             btn.setPrefWidth(200);
             btn.setStyle("-fx-font-size: 14px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 10;");
         }
 
-        menuAdmin.getChildren().addAll(btnAttractions, btnClients, btnEvenements, btnFactures, btnReservations);
+        menuAdmin.getChildren().addAll(btnAttractions, btnClients, btnEvenements, btnFactures, btnReservations,btnReporting);
 
         contentBox.getChildren().addAll(titre, emailLabel, roleLabel, menuAdmin);
 
@@ -87,7 +91,22 @@ public class VueAdmin {
             VueAdminClients.afficher(new Stage(), utilisateur);     ///pas de catch ici, code AdminAttraction à revoir dans le controleur et la vue
         });
 
+        btnReporting.setOnAction(e -> {
+            AttractionDAO attractionDAO = null;
+            try {
+                attractionDAO = new AttractionDAO(ConnexionBDD.getConnexion());
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            } catch (ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            ControleurReporting controleurReporting = new ControleurReporting(attractionDAO);
+            VueReporting vueReporting = new VueReporting(controleurReporting);
+            vueReporting.afficher(new Stage(), utilisateur);
 
+        });
 
         VBox mainLayout = new VBox(logoBox, contentBox);
         mainLayout.setStyle("-fx-background-color: #d0f5c8;");
