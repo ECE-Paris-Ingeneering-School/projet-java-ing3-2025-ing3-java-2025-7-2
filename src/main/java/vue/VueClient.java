@@ -14,8 +14,18 @@ import javafx.stage.Stage;
 import modele.Utilisateur;
 import modele.dao.ConnexionBDD;
 
+/**
+ * VueClient représente l'écran du profil client de l'application.
+ * Permet au client de consulter son profil et de naviguer vers d'autres modules.
+ */
 public class VueClient {
 
+    /**
+     * Affiche l'interface du profil client.
+     *
+     * @param stage La fenêtre principale JavaFX
+     * @param utilisateur L'utilisateur connecté
+     */
     public static void afficher(Stage stage, Utilisateur utilisateur) {
         stage.setTitle("Mon Profil Client");
 
@@ -65,18 +75,16 @@ public class VueClient {
             vueCal.afficher(new Stage());
             stage.close();
         });
-        btnCart.setOnAction(e ->{
-            try {
-                ControleurFactures controleurFactures = new ControleurFactures(ConnexionBDD.getConnexion()); // adapte si c’est déjà instancié ailleurs
-                new VueFactures(controleurFactures, utilisateur); // ouvre la vue des factures
-                ///stage.close();
-                /// ==> Fenêtre sans barre de navigation donc on la laisse en popup jusqu'à implémentation
 
+        btnCart.setOnAction(e -> {
+            try {
+                ControleurFactures controleurFactures = new ControleurFactures(ConnexionBDD.getConnexion());
+                new VueFactures(controleurFactures, utilisateur);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-
         });
+
         navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
 
         BorderPane root = new BorderPane();
@@ -88,6 +96,12 @@ public class VueClient {
         stage.show();
     }
 
+    /**
+     * Crée un bouton de navigation avec un emoji.
+     *
+     * @param emoji Le symbole à afficher sur le bouton
+     * @return Le bouton configuré
+     */
     private static Button creerBoutonNavigation(String emoji) {
         Button btn = new Button(emoji);
         btn.setStyle(
