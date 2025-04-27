@@ -83,7 +83,7 @@ public class VueClient {
         root.setCenter(mainLayout);
         root.setBottom(navBar);
 
-        Scene scene = new Scene(root, 350, 550);
+        Scene scene = new Scene(root, 350, 600);
         stage.setScene(scene);
         stage.show();
     }
