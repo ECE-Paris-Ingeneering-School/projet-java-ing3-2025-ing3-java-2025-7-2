@@ -1,4 +1,4 @@
-package vue;
+/*package vue;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -26,7 +26,7 @@ import java.util.List;
  * VueUtilisateur est la vue permettant à un utilisateur de consulter son profil.
  * Pour un administrateur, elle propose aussi la gestion des attractions et des événements.
  */
-public class VueUtilisateur {
+//public class VueUtilisateur {
 
     /**
      * Affiche l'interface de profil utilisateur.
@@ -39,7 +39,7 @@ public class VueUtilisateur {
      * @throws IOException Si une erreur d'entrée/sortie survient
      * @throws ClassNotFoundException Si une classe est manquante
      */
-    public static void afficher(Stage stage, ConnexionBDD conn, Utilisateur utilisateur) throws SQLException, IOException, ClassNotFoundException {
+   /* public static void afficher(Stage stage, ConnexionBDD conn, Utilisateur utilisateur) throws SQLException, IOException, ClassNotFoundException {
         stage.setTitle("Mon Profil");
 
         
@@ -93,7 +93,7 @@ public class VueUtilisateur {
      * @param vboxUserInfo Conteneur d'affichage
      * @throws SQLException Si une erreur SQL survient
      */
-    private static void afficherGestionAttractions(ConnexionBDD conn, VBox vboxUserInfo) throws SQLException {
+    /*private static void afficherGestionAttractions(ConnexionBDD conn, VBox vboxUserInfo) throws SQLException {
         Label gestionAttractionsLabel = new Label("Gestion des Attractions");
         gestionAttractionsLabel.setFont(Font.font("Arial", 16));
         gestionAttractionsLabel.setTextFill(Color.web("#2c3e50"));
@@ -175,7 +175,7 @@ public class VueUtilisateur {
      * @param vboxUserInfo Conteneur d'affichage
      * @throws SQLException Si une erreur SQL survient
      */
-    private static void afficherGestionEvenements(ConnexionBDD conn, VBox vboxUserInfo) throws SQLException {
+  /*  private static void afficherGestionEvenements(ConnexionBDD conn, VBox vboxUserInfo) throws SQLException {
         Label gestionEvenementsLabel = new Label("Gestion des Événements");
         gestionEvenementsLabel.setFont(Font.font("Arial", 16));
         gestionEvenementsLabel.setTextFill(Color.web("#2c3e50"));
@@ -212,3 +212,4 @@ public class VueUtilisateur {
         alert.showAndWait();
     }
 }
+*/
