@@ -8,7 +8,15 @@ import java.sql.*;
 import java.util.*;
 import java.util.Date;
 
+/**
+ * Classe DAO pour gérer les opérationsde la BDD liées aux clients
+ */
 public class ClientDAO {
+
+    /**
+     * Récupère tous les clients existants dans la BDD
+     * @return liste d'objets {@link Client}
+     */
     public List<Client> getAllClients() {
         List<Client> liste_clients = new ArrayList<>();
 
@@ -40,6 +48,12 @@ public class ClientDAO {
         return liste_clients;
     }
 
+    /**
+     * Récupère un client spécifique à partir de son identifiant.
+     *
+     * @param idClient l'identifiant du client.
+     * @return l'objet {@link Client} correspondant, ou {@code null} si non trouvé.
+     */
     public Client getClientParId(int idClient) throws SQLException, IOException, ClassNotFoundException {
         Client client = null;
         String sql = "SELECT * FROM client WHERE idClient = ?";
@@ -64,6 +78,11 @@ public class ClientDAO {
         return client;
     }
 
+    /**
+     * Ajoute un nouveau client dans la base de données.
+     *
+     * @param client l'objet {@link Client} à ajouter.
+     */
     public void ajouterClient(Client client) throws Exception {
         try (Connection conn = ConnexionBDD.getConnexion()) {
             String sql = "INSERT INTO client (mail, motDePasse, nom, prenom, datedeNaissance) VALUES (?, ?, ?, ?, ?)";
@@ -78,6 +97,11 @@ public class ClientDAO {
         }
     }
 
+    /**
+     * Modifie les informations d'un client existant.
+     *
+     * @param client l'objet {@link Client} contenant les informations à mettre à jour.
+     */
     public void modifierClient(Client client) throws Exception {
         try (Connection conn = ConnexionBDD.getConnexion()) {
             String sql = "UPDATE client SET mail=?, motDePasse=?, nom=?, prenom=?, datedeNaissance=? WHERE idClient=?";
@@ -93,6 +117,10 @@ public class ClientDAO {
         }
     }
 
+    /**
+     * Supprime un client de la base de données en fonction de son identifiant.
+     * @param idClient l'identifiant du client à supprimer.
+     */
     public void supprimerClient(int idClient) throws Exception {
         try (Connection conn = ConnexionBDD.getConnexion()) {
             String sql = "DELETE FROM client WHERE idClient = ?";

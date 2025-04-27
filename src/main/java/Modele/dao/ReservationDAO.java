@@ -12,14 +12,29 @@ import java.util.Map;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-
+/**
+ * Classe DAO pour gérer les opérations liées à la BDD et aux réservations
+ * Ainsi que génerer les factures des clients
+ */
 public class ReservationDAO {
 
     private Connection conn;
 
+    /**
+     * Constructeur DAO avec une connexion existante
+     * @param conn une connexion
+     */
     public ReservationDAO(Connection conn) {
         this.conn = conn;
     }
+
+    /**
+     * Ajoute une nouvelle réservation pour un client à une date donnée
+     *
+     * @param idClient      L'identifiant du client
+     * @param idAttraction  L'identifiant de l'attraction
+     * @param dateAttraction La date souhaitée pour l'attraction
+     */
     public void ajouterReservation(int idClient, int idAttraction, Date dateAttraction) throws SQLException {
         String sql = "INSERT INTO reservation (idClient, idAttraction, dateAttraction, dateReservation, idFacture) VALUES (?, ?, ?, CURDATE(),0)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -31,6 +46,10 @@ public class ReservationDAO {
     }
 
 
+    /**
+     * Supprime une réservation existante par son identifiant
+     * @param idReservation L'identifiant de la réservation
+     */
     public void supprimerReservation(int idReservation) throws SQLException {
         System.out.println("debug du suppr, id reservation: " + idReservation);
         String sql = "DELETE FROM reservation WHERE idReservation = ?";
@@ -41,6 +60,11 @@ public class ReservationDAO {
     }
 
 
+    /**
+     * Modifie la date d'une réservation existante
+     * @param idReservation L'identifiant de la réservation
+     * @param nouvelleDate  La nouvelle date pour l'attraction
+     */
     public void modifierDateReservation(int idReservation, Date nouvelleDate) throws SQLException {
         String sql = "UPDATE reservation SET dateAttraction = ? WHERE idReservation = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -51,6 +75,12 @@ public class ReservationDAO {
     }
 
 
+    /**
+     * Récupère la liste des réservations d'un client sous forme de chaînes descriptives.
+     *
+     * @param idClient L'identifiant du client
+     * @return Liste des réservations sous forme de texte
+     */
     public List<String> getReservationsParClient(int idClient) throws SQLException {
         List<String> reservations = new ArrayList<>();
         String sql = "SELECT r.idReservation, a.nom, r.dateAttraction " +
@@ -77,7 +107,14 @@ public class ReservationDAO {
 
     }
 
-    // Récupérer les détails des réservations d'un client à une date donnée, qui n'ont pas encore de facture
+    /**
+     * Récupère les réservations d'un client pour une date de réservation précise
+     * en filtrant celles qui n'ont pas encore de facture (idFacture = 0)
+     *
+     * @param idClient       L'identifiant du client
+     * @param dateReservation La date de réservation
+     * @return Liste des réservations détaillées
+     */
     public List<String> getReservationsDetailsParClientEtDate(int idClient, Date dateReservation) throws SQLException {
         List<String> reservations = new ArrayList<>();
         String sql = "SELECT r.idReservation, a.nom, r.dateAttraction, r.dateReservation " +
@@ -101,6 +138,13 @@ public class ReservationDAO {
 
 
 
+    /**
+     * Crée une facture pour un client basé sur ses réservations non facturées
+     * Met à jour les réservations pour les associer à la facture générée
+     *
+     * @param idClient L'identifiant du client
+     * @return L'identifiant de la facture créée
+     */
     public int creerFacture(int idClient) throws SQLException {
         int idFacture = 0; // Déclaration en dehors du try
 
@@ -173,6 +217,12 @@ public class ReservationDAO {
 
 
 
+    /**
+     * Récupère les détails d'une facture (attractions, prix, suppléments) pour un identifiant donné
+     *
+     * @param idFacture L'identifiant de la facture
+     * @return Map contenant la date, les réservations, le nombre et le total de la facture
+     */
     public Map<String, Object> getFactureDetailsAvecReservations(int idFacture) throws SQLException {
         Map<String, Object> res = new java.util.HashMap<>();
         List<String> details = new ArrayList<>();
@@ -217,6 +267,12 @@ public class ReservationDAO {
         return res;
     }
 
+    /**
+     * Récupère le supplément lié à un événement pour une date donnée
+     *
+     * @param date La date pour laquelle chercher les événements
+     * @return Le montant du supplément, ou null s'il n'y a pas de supplément
+     */
     private BigDecimal getSupplementEvenementPourDate(Date date) throws SQLException {
         String sql = "SELECT supplement FROM evenement WHERE dateDebut <= ? AND dateFin >= ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -234,6 +290,13 @@ public class ReservationDAO {
         }
     }
 
+    /**
+     * Récupère les réservations passées d'un client
+     *
+     * @param idClient L'identifiant du client
+     * @param today    La date du jour
+     * @return Liste des réservations passées
+     */
     public List<String> getReservationsDetailsParClientEtDatePassee(int idClient, Date today) {
         List<String> reservations = new ArrayList<>();
         String sql = "SELECT r.idReservation, r.dateAttraction, a.nom, a.prix FROM reservation r " +
@@ -274,6 +337,13 @@ public class ReservationDAO {
 
 
 
+    /**
+     * Récupère les réservations futures d'un client
+     *
+     * @param idClient L'identifiant du client
+     * @param today    La date du jour (pour comparaison)
+     * @return Liste des réservations futures
+     */
     public List<String> getReservationsDetailsParClientEtDateFuture(int idClient, Date today) {
         List<String> reservations = new ArrayList<>();
         String sql = "SELECT r.idReservation, r.dateAttraction, a.nom, a.prix FROM reservation r " +
@@ -311,6 +381,12 @@ public class ReservationDAO {
         return reservations;
     }
 
+    /**
+     * Récupère les réservations passées d'un client qui n'ont pas encore été facturées
+     *
+     * @param idClient L'identifiant du client
+     * @return Liste d'objets représentant les réservations à facturer
+     */
     public List<Object[]> getReservationsPasseesPourFacturation(int idClient) {
         List<Object[]> reservations = new ArrayList<>();
         String sql = "SELECT r.idReservation, a.nom, r.dateAttraction, a.prix FROM reservation r " +
