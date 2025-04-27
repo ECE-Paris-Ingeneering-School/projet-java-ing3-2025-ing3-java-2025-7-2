@@ -99,4 +99,7 @@ public class Evenement {
     public String toString() {return "Evenement [idEvenement=" + idEvenement + ", nom=" + nom + ", nbReservations=" + nbReservations + "]";}
 
     public void setImage(String image) {this.image = image;}
+    public String getImage() {
+        return image;
+    }
 }

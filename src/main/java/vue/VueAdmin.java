@@ -3,6 +3,7 @@ package vue;
 import controleur.ControleurFactures;
 import controleur.ControleurReporting;
 import controleur.ControleurUtilisateur;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -106,6 +107,17 @@ public class VueAdmin {
             VueReporting vueReporting = new VueReporting(controleurReporting);
             vueReporting.afficher(new Stage(), utilisateur);
 
+        });
+        btnEvenements.setOnAction(e -> {
+            try {
+                VueAdminEvenements.afficher(new Stage(), utilisateur);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            } catch (ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }     ///pas de catch ici, code AdminAttraction à revoir dans le controleur et la vue
         });
 
         VBox mainLayout = new VBox(logoBox, contentBox);

@@ -1,4 +1,4 @@
-package vue;
+/*package vue;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -259,3 +259,4 @@ public class VueUtilisateur {
         stage.show();
     }
 }
+*/

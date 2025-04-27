@@ -25,13 +25,12 @@ public class ControleurEvenement {
 
     public List<LocalDate> getDatesAvecEvenements(YearMonth yearMonth){
 
-       List<LocalDate> dates = new ArrayList<>();
+        List<LocalDate> dates = new ArrayList<>();
         try {
-            List<String> evenements = evenementDAO.getEvenementsForMonth(yearMonth);
-            for (String evt : evenements) {
-                String[] parts = evt.split("\\(")[1].replace(")", "").split(" - ");
-                LocalDate start = LocalDate.parse(parts[0]);
-                LocalDate end = LocalDate.parse(parts[1]);
+            List<Evenement> evenements = evenementDAO.getEvenementsForMonth(yearMonth);
+            for (Evenement evt : evenements) {
+                LocalDate start = ((java.sql.Date) evt.getDateDebut()).toLocalDate();
+                LocalDate end = ((java.sql.Date) evt.getDateFin()).toLocalDate();
                 while (!start.isAfter(end)) {
                     if (start.getMonth() == yearMonth.getMonth()) {
                         dates.add(start);
@@ -40,10 +39,11 @@ public class ControleurEvenement {
                 }
             }
         } catch (SQLException e){
-           e.printStackTrace();
+            e.printStackTrace();
         }
         return dates;
     }
+
 
     public Integer getIDEvenementParDate(LocalDate date){
         try{

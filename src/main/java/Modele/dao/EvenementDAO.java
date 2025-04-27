@@ -28,9 +28,9 @@ public class EvenementDAO {
      * @param yearMonth Mois et année ciblés
      * @return Liste de descriptions des événements
      */
-    public List<String> getEvenementsForMonth(YearMonth yearMonth) throws SQLException {
-        List<String> evenements = new ArrayList<>();
-        String sql = "SELECT nom, dateDebut, dateFin FROM evenement WHERE (dateDebut BETWEEN ? AND ?) OR (dateFin BETWEEN ? AND ?)";
+    public List<Evenement> getEvenementsForMonth(YearMonth yearMonth) throws SQLException {
+        List<Evenement> evenements = new ArrayList<>();
+        String sql = "SELECT * FROM evenement WHERE (dateDebut BETWEEN ? AND ?) OR (dateFin BETWEEN ? AND ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             LocalDate firstDayOfMonth = yearMonth.atDay(1);
@@ -43,7 +43,13 @@ public class EvenementDAO {
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                String evenement = rs.getString("nom") + " (" + rs.getDate("dateDebut") + " - " + rs.getDate("dateFin") + ")";
+                Evenement evenement = new Evenement();
+                evenement.setIdEvenement(rs.getInt("idEvenement"));
+                evenement.setNom(rs.getString("nom"));
+                evenement.setImage(rs.getString("image"));
+                evenement.setSupplement(rs.getDouble("supplement"));
+                evenement.setDateDebut(rs.getDate("dateDebut"));
+                evenement.setDateFin(rs.getDate("dateFin"));
                 evenements.add(evenement);
             }
         }
@@ -82,13 +88,14 @@ public class EvenementDAO {
      * @param dateDebut Date de début de l'événement
      * @param dateFin Date de fin de l'événement
      */
-    public void ajouterEvenement(String nom, double supplement, Date dateDebut, Date dateFin) throws SQLException {
-        String sql = "INSERT INTO evenement (nom, supplement, dateDebut, dateFin) VALUES (?, ?, ?, ?)";
+    public void ajouterEvenement(String nom, double supplement, Date dateDebut, Date dateFin,String image) throws SQLException {
+        String sql = "INSERT INTO evenement (nom, supplement, dateDebut, dateFin, image) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nom);
             stmt.setDouble(2, supplement);
             stmt.setDate(3, dateDebut);
             stmt.setDate(4, dateFin);
+            stmt.setString(5, image);
             stmt.executeUpdate();
         }
     }
@@ -103,7 +110,8 @@ public class EvenementDAO {
      * @param dateDebut Nouvelle date de début
      * @param dateFin Nouvelle date de fin
      */
-    public void modifierEvenement(int idEvenement, String nom, double supplement, Date dateDebut, Date dateFin) throws SQLException {
+    /// ancienne méthode
+/**    public void modifierEvenement(int idEvenement, String nom, double supplement, Date dateDebut, Date dateFin) throws SQLException {
         String sql = "UPDATE evenement SET nom = ?, supplement = ?, dateDebut = ?, dateFin = ? WHERE idEvenement = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nom);
@@ -113,8 +121,19 @@ public class EvenementDAO {
             stmt.setInt(5, idEvenement);
             stmt.executeUpdate();
         }
+    }**/
+public void modifierEvenement(Evenement evenement) throws SQLException {
+    String sql = "UPDATE evenement SET nom = ?, supplement = ?, dateDebut = ?, dateFin = ?, image = ? WHERE idEvenement = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, evenement.getNom());
+        stmt.setDouble(2, evenement.getSupplement());
+        stmt.setDate(3, new java.sql.Date(evenement.getDateDebut().getTime()));
+        stmt.setDate(4, new java.sql.Date(evenement.getDateFin().getTime()));
+        stmt.setString(5, evenement.getImage());
+        stmt.setInt(6, evenement.getIdEvenement());
+        stmt.executeUpdate();
     }
-
+}
     /**
      * Supprime un événement de la base de données.
      *
@@ -142,6 +161,7 @@ public class EvenementDAO {
                 Evenement evenement = new Evenement();
                 evenement.setIdEvenement(rs.getInt("idEvenement"));
                 evenement.setNom(rs.getString("nom"));
+                evenement.setImage(rs.getString("image"));
                 evenement.setSupplement(rs.getDouble("supplement"));
                 evenement.setDateDebut(rs.getDate("dateDebut"));
                 evenement.setDateFin(rs.getDate("dateFin"));
@@ -192,7 +212,7 @@ public class EvenementDAO {
             stmt.setDate(1, sqlDate); // dateDebut <= date
             stmt.setDate(2, sqlDate); // dateFin >= date
 
-            System.out.println("→ Vérification requête pour date : " + sqlDate); // DEBUG
+            System.out.println(" Vérification requête pour date : " + sqlDate); // DEBUG
 
             ResultSet rs = stmt.executeQuery();
 
@@ -200,6 +220,7 @@ public class EvenementDAO {
                 Evenement evt = new Evenement();
                 evt.setIdEvenement(rs.getInt("idEvenement"));
                 evt.setNom(rs.getString("nom"));
+                evt.setImage(rs.getString("image"));
                 evt.setSupplement(rs.getDouble("supplement"));
                 evt.setDateDebut(rs.getDate("dateDebut"));
                 evt.setDateFin(rs.getDate("dateFin"));
