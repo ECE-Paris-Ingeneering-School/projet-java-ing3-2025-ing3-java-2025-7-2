@@ -18,17 +18,36 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * VueFactures est la vue affichant les factures d'un utilisateur sous forme de tableau.
+ */
 public class VueFactures {
 
     private final ControleurFactures controleurFactures;
     private final Utilisateur utilisateur;
 
+    /**
+     * Constructeur de VueFactures.
+     *
+     * @param controleurFactures Le contrôleur chargé de récupérer les factures
+     * @param utilisateur L'utilisateur connecté
+     * @throws SQLException si problème BDD
+     * @throws IOException si problème d'entrée/sortie
+     * @throws ClassNotFoundException si la classe DAO est introuvable
+     */
     public VueFactures(ControleurFactures controleurFactures, Utilisateur utilisateur) throws SQLException, IOException, ClassNotFoundException {
         this.controleurFactures = controleurFactures;
         this.utilisateur = utilisateur;
         afficherFactures();
     }
 
+    /**
+     * Affiche la liste des factures de l'utilisateur dans une nouvelle fenêtre.
+     *
+     * @throws SQLException si erreur de base de données
+     * @throws IOException si erreur d'entrée/sortie
+     * @throws ClassNotFoundException si classe manquante
+     */
     public void afficherFactures() throws SQLException, IOException, ClassNotFoundException {
         Stage stage = new Stage();
         stage.setTitle("Mes factures");
@@ -75,37 +94,59 @@ public class VueFactures {
         contenu.setAlignment(Pos.TOP_CENTER);
         contenu.setPadding(new Insets(15, 10, 15, 10));
 
-
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #d0f5c8;");
         root.setCenter(contenu);
 
-        Scene scene = new Scene(root, 400, 400); // format mobile
+        Scene scene = new Scene(root, 400, 400);
         stage.setScene(scene);
         stage.show();
     }
 
-
-    // Classe interne pour lier les données à la vue
+    /**
+     * Classe interne représentant une Facture pour l'affichage dans TableView.
+     */
     public static class FactureFX {
         private final int idFacture;
         private final Date dateFacture;
         private final double prix;
 
+        /**
+         * Constructeur de la facture affichable.
+         *
+         * @param idFacture Identifiant de la facture
+         * @param dateFacture Date de la facture
+         * @param prix Montant de la facture
+         */
         public FactureFX(int idFacture, Date dateFacture, double prix) {
             this.idFacture = idFacture;
             this.dateFacture = dateFacture;
             this.prix = prix;
         }
 
+        /**
+         * Retourne l'ID de la facture.
+         *
+         * @return idFacture
+         */
         public int getIdFacture() {
             return idFacture;
         }
 
+        /**
+         * Retourne la date de la facture.
+         *
+         * @return dateFacture
+         */
         public Date getDateFacture() {
             return dateFacture;
         }
 
+        /**
+         * Retourne le prix de la facture.
+         *
+         * @return prix
+         */
         public double getPrix() {
             return prix;
         }
