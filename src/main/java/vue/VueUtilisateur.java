@@ -42,7 +42,7 @@ public class VueUtilisateur {
     public static void afficher(Stage stage, ConnexionBDD conn, Utilisateur utilisateur) throws SQLException, IOException, ClassNotFoundException {
         stage.setTitle("Mon Profil");
 
-        
+        // ===== Logo en haut à gauche =====
         Image logoImage = new Image(VueUtilisateur.class.getResource("/images/logo_JP.png").toExternalForm());
         ImageView logoView = new ImageView(logoImage);
         logoView.setFitHeight(80);
@@ -51,12 +51,12 @@ public class VueUtilisateur {
         logoBox.setAlignment(Pos.TOP_LEFT);
         logoBox.setPadding(new Insets(10, 0, 0, 10));
 
-        
+        // ===== Conteneur principal =====
         VBox mainLayout = new VBox(20);
         mainLayout.setAlignment(Pos.TOP_CENTER);
         mainLayout.setPadding(new Insets(10));
 
-       
+        // ===== Informations de l'utilisateur =====
         VBox vboxUserInfo = new VBox(15);
         vboxUserInfo.setAlignment(Pos.CENTER);
         vboxUserInfo.setStyle("-fx-background-color: #ecf0f1; -fx-padding: 20; -fx-border-radius: 10;");
@@ -70,13 +70,13 @@ public class VueUtilisateur {
         utilisateurInfo.setStyle("-fx-border-color: #bdc3c7; -fx-border-radius: 10; -fx-padding: 10;");
         vboxUserInfo.getChildren().add(utilisateurInfo);
 
-       
+        // ===== Gestion attractions si admin =====
         if (utilisateur.getRole().equals("admin")) {
             afficherGestionAttractions(conn, vboxUserInfo);
             afficherGestionEvenements(conn, vboxUserInfo);
         }
 
-      
+        // ===== Affichage final =====
         ScrollPane scrollPane = new ScrollPane(vboxUserInfo);
         scrollPane.setFitToWidth(true);
         scrollPane.setStyle("-fx-background-color: #ecf0f1;");
@@ -197,7 +197,7 @@ public class VueUtilisateur {
 
         vboxUserInfo.getChildren().addAll(gestionEvenementsLabel, evenementsListView, btnAjouterEvenement, btnModifierEvenement, btnSupprimerEvenement);
 
-       
+        // Idem : ici les actions sur événements...
     }
 
     private static void styliserBoutonAdmin(Button btn, String couleur) {
