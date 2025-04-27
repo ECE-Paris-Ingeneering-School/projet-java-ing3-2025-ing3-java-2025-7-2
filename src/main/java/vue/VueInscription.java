@@ -14,10 +14,19 @@ import javafx.stage.Stage;
 
 import java.sql.Date;
 
+/**
+ * VueInscription est la vue permettant aux utilisateurs
+ * de créer un nouveau compte client dans l'application.
+ */
 public class VueInscription {
 
     private final ControleurInscription controleur = new ControleurInscription();
 
+    /**
+     * Affiche la fenêtre d'inscription.
+     *
+     * @param stage La scène principale JavaFX
+     */
     public void afficher(Stage stage) {
 
         Image logoImage = new Image(getClass().getResource("/images/logo_JP.png").toExternalForm());
@@ -77,7 +86,6 @@ public class VueInscription {
         );
 
         creerCompteButton.setOnAction(event -> {
-
             if (nomField.getText().isEmpty() || prenomField.getText().isEmpty()
                     || emailField.getText().isEmpty() || mdpField.getText().isEmpty()
                     || datePicker.getValue() == null) {
@@ -141,7 +149,6 @@ public class VueInscription {
                 creerBoutonNavigation("👤")
         );
 
-        // Layout principal
         BorderPane root = new BorderPane();
         root.setCenter(centerBox);
         root.setBottom(navBar);
@@ -153,6 +160,12 @@ public class VueInscription {
         stage.show();
     }
 
+    /**
+     * Applique un style personnalisé à un champ de texte.
+     *
+     * @param champ Le champ à styliser
+     * @param width La largeur maximale
+     */
     private void styliserChamp(TextField champ, double width) {
         champ.setStyle(
                 "-fx-background-radius: 10;" +
@@ -166,6 +179,12 @@ public class VueInscription {
         champ.setMaxWidth(width);
     }
 
+    /**
+     * Crée un bouton de navigation avec un emoji.
+     *
+     * @param emoji Le symbole emoji du bouton
+     * @return Le bouton créé
+     */
     private Button creerBoutonNavigation(String emoji) {
         Button btn = new Button(emoji);
         btn.setStyle(
