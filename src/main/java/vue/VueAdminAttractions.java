@@ -2,11 +2,14 @@ package vue;
 
 import controleur.ControleurAdminAttractions;
 import javafx.geometry.Insets;
+
+
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
+
 import javafx.stage.Stage;
 import modele.Attraction;
 import modele.Utilisateur;
@@ -16,8 +19,21 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * VueAdminAttractions est la vue permettant à l'administrateur
+ * de gérer les attractions du parc (ajout, modification, suppression).
+ */
 public class VueAdminAttractions {
 
+    /**
+     * Affiche l'interface de gestion des attractions pour l'administrateur.
+     *
+     * @param stage La fenêtre principale
+     * @param utilisateur L'utilisateur connecté
+     * @throws SQLException si un problème SQL survient
+     * @throws IOException si un problème d'entrée/sortie survient
+     * @throws ClassNotFoundException si une classe est introuvable
+     */
     public static void afficher(Stage stage, Utilisateur utilisateur) throws SQLException, IOException, ClassNotFoundException {
         stage.setTitle("Gestion des Attractions");
 
@@ -73,6 +89,12 @@ public class VueAdminAttractions {
         stage.show();
     }
 
+    /**
+     * Recharge la liste d'attractions dans le conteneur donné.
+     *
+     * @param container Le conteneur où afficher les attractions
+     * @param controleur Le controleur associé
+     */
     private static void rafraichirListeAttractions(VBox container, ControleurAdminAttractions controleur) {
         container.getChildren().clear();
         List<Attraction> attractions = controleur.getToutesAttractions();
@@ -102,6 +124,12 @@ public class VueAdminAttractions {
         }
     }
 
+    /**
+     * Affiche une fenêtre pop-up pour ajouter une attraction.
+     *
+     * @param controleur Le controleur d'attractions
+     * @param onSuccess Callback à appeler après succès
+     */
     private static void afficherPopupAjout(ControleurAdminAttractions controleur, Runnable onSuccess) {
         TextInputDialog dialogNom = new TextInputDialog();
         dialogNom.setHeaderText("Nom de l'attraction");
@@ -127,6 +155,13 @@ public class VueAdminAttractions {
         }
     }
 
+    /**
+     * Affiche une fenêtre pop-up pour modifier une attraction existante.
+     *
+     * @param controleur Le controleur d'attractions
+     * @param attraction L'attraction à modifier
+     * @param onSuccess Callback à appeler après succès
+     */
     private static void afficherPopupModification(ControleurAdminAttractions controleur, Attraction attraction, Runnable onSuccess) {
         TextInputDialog dialogNom = new TextInputDialog(attraction.getNom());
         dialogNom.setHeaderText("Modifier le nom");
@@ -152,6 +187,13 @@ public class VueAdminAttractions {
         }
     }
 
+    /**
+     * Affiche une fenêtre de confirmation pour supprimer une attraction.
+     *
+     * @param controleur Le controleur d'attractions
+     * @param attraction L'attraction à supprimer
+     * @param onSuccess Callback à appeler après succès
+     */
     private static void afficherPopupSuppression(ControleurAdminAttractions controleur, Attraction attraction, Runnable onSuccess) {
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("Suppression");
@@ -169,11 +211,22 @@ public class VueAdminAttractions {
         }
     }
 
+    /**
+     * Affiche une alerte d'erreur.
+     *
+     * @param message Le message d'erreur
+     */
     private static void alerte(String message) {
         Alert alerte = new Alert(Alert.AlertType.ERROR, message);
         alerte.showAndWait();
     }
 
+    /**
+     * Crée un bouton de navigation avec un emoji.
+     *
+     * @param emoji Le symbole emoji à afficher
+     * @return Le bouton créé
+     */
     private static Button creerBoutonNavigation(String emoji) {
         Button btn = new Button(emoji);
         btn.setStyle(
