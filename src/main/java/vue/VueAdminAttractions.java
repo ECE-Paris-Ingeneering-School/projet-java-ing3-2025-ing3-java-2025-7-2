@@ -1,6 +1,7 @@
 package vue;
 
 import controleur.ControleurAdminAttractions;
+import controleur.ControleurFactures;
 import javafx.geometry.Insets;
 
 
@@ -13,6 +14,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import modele.Attraction;
 import modele.Utilisateur;
+import modele.dao.ConnexionBDD;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -76,13 +78,41 @@ public class VueAdminAttractions {
         navBar.setAlignment(Pos.CENTER);
         navBar.setPadding(new Insets(15));
         navBar.setStyle("-fx-background-color: yellow;");
-        navBar.getChildren().addAll(
-                creerBoutonNavigation("🏠"),
-                creerBoutonNavigation("📅"),
-                creerBoutonNavigation("🛒"),
-                creerBoutonNavigation("👤")
-        );
+        Button btnHome = creerBoutonNavigation("🏠");
+        Button btnCalendar = creerBoutonNavigation("📅");
+        Button btnCart = creerBoutonNavigation("🛒");
+        Button btnUser = creerBoutonNavigation("👤");
+
+        navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
         root.setBottom(navBar);
+
+        btnUser.setOnAction(e -> {
+            try {
+                if ("client".equalsIgnoreCase(utilisateur.getRole())) {
+                    VueClient.afficher(new Stage(), utilisateur);
+                } else if ("admin".equalsIgnoreCase(utilisateur.getRole())) {
+                    VueAdmin.afficher(new Stage(), utilisateur);
+                }
+                stage.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        btnCart.setOnAction(e -> {
+            try {
+                ControleurFactures controleurFactures = new ControleurFactures(ConnexionBDD.getConnexion());
+                new VueFactures(controleurFactures, utilisateur);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        btnCalendar.setOnAction(e -> {
+            VueCalendrier vueCal = new VueCalendrier(utilisateur);
+            vueCal.afficher(new Stage());
+            stage.close();
+        });
 
         Scene scene = new Scene(root, 350, 550);
         stage.setScene(scene);
