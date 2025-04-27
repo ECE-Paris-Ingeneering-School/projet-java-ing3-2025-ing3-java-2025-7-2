@@ -11,10 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * ControleurReservations gère toutes les opérations
+ * liées aux réservations et factures des utilisateurs.
+ */
 public class ControleurReservations {
 
-    public List<String> getReservationsPour(Utilisateur utilisateur) {  /// retourn reserv selon objet utilisateur passé en paramètre
-                                                                            /// ancienne méthode, plus utilisée dans les dernières versions
+    /**
+     * Récupère toutes les réservations actuelles d'un utilisateur (ancienne version).
+     *
+     * @param utilisateur Utilisateur concerné
+     * @return Liste de descriptions de réservations
+     */
+    public List<String> getReservationsPour(Utilisateur utilisateur) {
         try (Connection conn = ConnexionBDD.getConnexion()) {
             ReservationDAO dao = new ReservationDAO(conn);
             Date today = Date.valueOf(LocalDate.now());
@@ -24,9 +33,15 @@ public class ControleurReservations {
             return new ArrayList<>();
         }
     }
+
+    /**
+     * Supprime une réservation selon son identifiant.
+     *
+     * @param idReservation Identifiant de la réservation
+     * @return true si suppression réussie, false sinon
+     */
     public boolean supprimerReservation(int idReservation) {
         System.out.println("debug du suppr, id reservation: " + idReservation);
-
         try (Connection conn = ConnexionBDD.getConnexion()) {
             ReservationDAO dao = new ReservationDAO(conn);
             dao.supprimerReservation(idReservation);
@@ -37,6 +52,12 @@ public class ControleurReservations {
         }
     }
 
+    /**
+     * Génère une facture pour un utilisateur.
+     *
+     * @param utilisateur Utilisateur concerné
+     * @return ID de la facture générée ou null en cas d'erreur
+     */
     public Integer genererFacture(Utilisateur utilisateur) {
         try (Connection conn = ConnexionBDD.getConnexion()) {
             ReservationDAO dao = new ReservationDAO(conn);
@@ -46,6 +67,13 @@ public class ControleurReservations {
             return null;
         }
     }
+
+    /**
+     * Récupère les détails d'une facture donnée.
+     *
+     * @param idFacture Identifiant de la facture
+     * @return Map contenant les informations de la facture
+     */
     public Map<String, Object> getFactureDetails(int idFacture) {
         try (Connection conn = ConnexionBDD.getConnexion()) {
             ReservationDAO dao = new ReservationDAO(conn);
@@ -56,7 +84,12 @@ public class ControleurReservations {
         }
     }
 
-
+    /**
+     * Récupère toutes les réservations futures d'un utilisateur.
+     *
+     * @param utilisateur Utilisateur concerné
+     * @return Liste de réservations futures
+     */
     public List<String> getReservationsFutures(Utilisateur utilisateur) {
         try (Connection conn = ConnexionBDD.getConnexion()) {
             ReservationDAO dao = new ReservationDAO(conn);
@@ -67,6 +100,13 @@ public class ControleurReservations {
             return new ArrayList<>();
         }
     }
+
+    /**
+     * Récupère toutes les réservations passées d'un utilisateur.
+     *
+     * @param utilisateur Utilisateur concerné
+     * @return Liste de réservations passées
+     */
     public List<String> getReservationsPassees(Utilisateur utilisateur) {
         try (Connection conn = ConnexionBDD.getConnexion()) {
             ReservationDAO dao = new ReservationDAO(conn);

@@ -15,31 +15,26 @@ import javafx.stage.Stage;
 import controleur.ControleurConnexion;
 import modele.Utilisateur;
 
-/// à disparaitre :
-/**import modele.Utilisateur;
-import controleur.AuthentificationService; //inexistant -> se trouve dans le modele maintenant
-import modele.dao.ConnexionBDD;
-
-import java.sql.Connection;
-
-
-import java.util.*;
-import modele.Attraction;
-import modele.dao.AttractionDAO;
-import modele.Admin;
- **/    ///POUR LES TESTS, à retirer
-
+/**
+ * vueConnexion est la fenêtre d'accueil permettant
+ * à l'utilisateur de se connecter ou de s'inscrire.
+ */
 public class vueConnexion extends Application {
 
     private ControleurConnexion controleur;
 
+    /**
+     * Point d'entrée de l'application : affiche l'écran de connexion.
+     *
+     * @param primaryStage La fenêtre principale JavaFX
+     */
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Connexion");
 
         controleur = new ControleurConnexion();
 
-        // ===== Logo en haut à gauche =====
+        
         Image logoImage = new Image(getClass().getResource("/images/logo_JP.png").toExternalForm());
         ImageView logoView = new ImageView(logoImage);
         logoView.setFitHeight(80);
@@ -48,12 +43,12 @@ public class vueConnexion extends Application {
         logoBox.setAlignment(Pos.TOP_LEFT);
         logoBox.setPadding(new Insets(10, 0, 0, 10));
 
-        // ===== Titre =====
+       
         Label titreLabel = new Label("Bienvenue !");
         titreLabel.setFont(Font.font("Arial", 26));
         titreLabel.setTextFill(Color.web("#2c3e50"));
 
-        // ===== Champs de connexion =====
+      
         TextField emailField = new TextField();
         emailField.setPromptText("Adresse mail");
         styliserChamp(emailField);
@@ -82,13 +77,12 @@ public class vueConnexion extends Application {
                         "-fx-padding: 8 20 8 20;"
         );
 
-        /// modif de tous les "event->connecter" en "event->controleur.connecter" etc ...
         loginButton.setOnAction(event -> gererConnexion(emailField.getText(), passwordField.getText(), primaryStage, messageLabel));
         emailField.setOnAction(event -> gererConnexion(emailField.getText(), passwordField.getText(), primaryStage, messageLabel));
         passwordField.setOnAction(event -> gererConnexion(emailField.getText(), passwordField.getText(), primaryStage, messageLabel));
         signupButton.setOnAction(event -> afficherInscription(primaryStage));
 
-        // ===== Navigation style mobile =====
+        
         HBox navBar = new HBox(15);
         navBar.setAlignment(Pos.CENTER);
         navBar.setPadding(new Insets(15));
@@ -100,8 +94,8 @@ public class vueConnexion extends Application {
         Button btnUser = creerBoutonNavigation("👤");
         navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
 
-        // ===== Contenu central =====
-        VBox contenu = new VBox(15, titreLabel, emailField, passwordField, loginButton,signupButton, messageLabel);
+        
+        VBox contenu = new VBox(15, titreLabel, emailField, passwordField, loginButton, signupButton, messageLabel);
         contenu.setAlignment(Pos.CENTER);
         contenu.setPadding(new Insets(10));
 
@@ -109,17 +103,22 @@ public class vueConnexion extends Application {
         VBox.setMargin(logoBox, new Insets(0, 0, 10, 0));
         centerBox.setAlignment(Pos.TOP_CENTER);
 
-        // ===== Layout principal avec navigation en bas =====
+        
         BorderPane root = new BorderPane();
         root.setCenter(centerBox);
         root.setBottom(navBar);
-        root.setStyle("-fx-background-color: #d0f5c8;"); // fond vert clair Jurassic Park
+        root.setStyle("-fx-background-color: #d0f5c8;");
 
         Scene scene = new Scene(root, 350, 550);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
+    /**
+     * Applique un style prédéfini à un champ de texte.
+     *
+     * @param champ Le champ de texte à styliser
+     */
     private void styliserChamp(TextField champ) {
         champ.setStyle(
                 "-fx-background-radius: 10;" +
@@ -127,12 +126,18 @@ public class vueConnexion extends Application {
                         "-fx-padding: 8;" +
                         "-fx-border-color: #bdc3c7;" +
                         "-fx-border-width: 1px;" +
-                        "-fx-background-color: #ff8f8f;" // rose inspiré de l'image JP
+                        "-fx-background-color: #ff8f8f;"
         );
         champ.setFont(Font.font("Arial", 14));
         champ.setMaxWidth(250);
     }
 
+    /**
+     * Crée un bouton de navigation avec un emoji.
+     *
+     * @param emoji Emoji à afficher
+     * @return Bouton stylisé
+     */
     private Button creerBoutonNavigation(String emoji) {
         Button btn = new Button(emoji);
         btn.setStyle(
@@ -147,73 +152,23 @@ public class vueConnexion extends Application {
         return btn;
     }
 
-  /**  private void connecter(TextField emailField, PasswordField passwordField, Label messageLabel, Stage primaryStage) {
-        String mail = emailField.getText();
-        String motDePasse = passwordField.getText();
-
-        AuthentificationService auth = new AuthentificationService();
-
-        try (Connection conn = ConnexionBDD.getConnexion()) {
-            Utilisateur utilisateur = auth.connecter(mail, motDePasse, conn);
-
-            if (utilisateur != null) {
-                /// CONDITION SUIVANTE POUR TESTS, à retirer
-                if ("admin".equals(utilisateur.getRole())) {
-
-                    //int id, String mail, String mdp, String nom, String prenom
-                    Admin admin = new Admin(utilisateur.getId(),utilisateur.getEmail(),"",utilisateur.getNom(), utilisateur.getPrenom());
-
-                    Scanner scanner = new Scanner(System.in);
-
-                    AttractionDAO dao = new AttractionDAO(conn);
-                    List<Attraction> attractions = dao.getAllAttractions();  // à adapter selon ton DAO réel
-
-                    System.out.println("=== Liste des attractions ===");
-                    for (Attraction a : attractions) {
-                        System.out.println("ID: " + a.getIdAttraction() + " | Nom: " + a.getNom() + " | Prix: " + a.getPrix());
-                    }
-
-                    System.out.print("\nEntrez l’ID de l’attraction à modifier : ");
-                    int id = scanner.nextInt();
-                    scanner.nextLine();
-
-                    System.out.print("Nouveau nom : ");
-                    String nom = scanner.nextLine();
-
-                    System.out.print("Nouveau prix : ");
-                    double prix = scanner.nextDouble();
-                    scanner.nextLine();
-                    System.out.print("Nouvelle image (chemin ou URL) : ");
-                    String image = scanner.nextLine();
-
-                    Attraction a = new Attraction(id, nom, prix, image);
-                    admin.modifierAttraction(a);
-
-
-                    System.out.println("admin !!!");
-                }
-                messageLabel.setText("Connexion réussie !");
-                messageLabel.setTextFill(Color.GREEN);
-
-                // Changer de scène vers le calendrier JavaFX
-                VueCalendrier vueCalendrier = new VueCalendrier(utilisateur);
-                vueCalendrier.afficher(primaryStage);
-
-            } else {
-                messageLabel.setText("Identifiants incorrects.");
-                messageLabel.setTextFill(Color.RED);
-            }
-        } catch (Exception e) {
-            messageLabel.setText("Erreur de connexion.");
-            messageLabel.setTextFill(Color.RED);
-            e.printStackTrace();
-        }
-    }**/
-
+    /**
+     * Méthode principale pour lancer l'application JavaFX.
+     *
+     * @param args Arguments de la ligne de commande
+     */
     public static void main(String[] args) {
-
         launch(args);
     }
+
+    /**
+     * Gère la tentative de connexion d'un utilisateur.
+     *
+     * @param email Email entré
+     * @param mdp Mot de passe entré
+     * @param stage Stage principal
+     * @param messageLabel Label où afficher les erreurs
+     */
     private void gererConnexion(String email, String mdp, Stage stage, Label messageLabel) {
         Utilisateur utilisateur = controleur.connecter(email, mdp);
 
@@ -227,9 +182,14 @@ public class vueConnexion extends Application {
             messageLabel.setStyle("-fx-text-fill: red;");
         }
     }
+
+    /**
+     * Ouvre la fenêtre d'inscription pour créer un compte.
+     *
+     * @param primaryStage Fenêtre principale
+     */
     private void afficherInscription(Stage primaryStage) {
         VueInscription vueInscription = new VueInscription();
         vueInscription.afficher(primaryStage);
     }
-
 }

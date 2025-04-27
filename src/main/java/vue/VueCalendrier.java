@@ -3,6 +3,8 @@ package vue;
 import controleur.Calendrier;
 import controleur.ControleurEvenement;
 import controleur.ControleurFactures;
+import vue.VueAccueil;
+import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -23,6 +25,10 @@ import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * VueCalendrier et la vue permettant d'afficher un calendrier interactif,
+ * avec navigation par Mois et affichage des attractions disponibles pour un utilisateur.
+ */
 public class VueCalendrier {
 
     private Calendrier controller;
@@ -34,12 +40,22 @@ public class VueCalendrier {
     private Stage stage;
     private ControleurEvenement controleurEvenement;
 
+    /**
+     * Constructeur de VueCalendrier.
+     *
+     * @param utilisateur L'utilisateur actuellement connecté
+     */
     public VueCalendrier(Utilisateur utilisateur) {
         this.utilisateurConnecte = utilisateur;
         this.controller = new Calendrier(this);
         this.controleurEvenement = new ControleurEvenement();
     }
 
+    /**
+     * Affiche la fenêtre du calendrier.
+     *
+     * @param stage La fenêtre JavaFX à utiliser
+     */
     public void afficher(Stage stage) {
         this.stage = stage;
 
@@ -145,6 +161,12 @@ public class VueCalendrier {
 
         });
 
+        btnHome.setOnAction(e -> {
+            VueAccueil vueAccueil = new VueAccueil (utilisateurConnecte); // Pas besoin de passer d’utilisateur
+            vueAccueil.afficher(new Stage());         // Affiche dans une nouvelle fenêtre
+            // Optionnel : stage.close(); // Si tu veux fermer la page actuelle
+        });
+
         // ===== Placement dans BorderPane =====
         root.setCenter(centerContent);
         root.setBottom(navBar);
@@ -157,6 +179,12 @@ public class VueCalendrier {
         stage.show();
     }
 
+    /**
+     * Crée un bouton de navigation avec un emoji.
+     *
+     * @param emoji Le symbole à afficher
+     * @return Le bouton configuré
+     */
     private Button creerBoutonNavigation(String emoji) {
         Button btn = new Button(emoji);
         btn.setStyle(
@@ -281,6 +309,11 @@ public class VueCalendrier {
         displayMonth(currentYearMonth.plusMonths(delta));
     }
 
+    /**
+     * Affiche les attractions disponibles pour un jour donné.
+     *
+     * @param date La date sélectionnée
+     */
     private void showDayAttractions(LocalDate date) {
         reservationPanel.getChildren().clear();
 
@@ -327,6 +360,13 @@ public class VueCalendrier {
         }
     }
 
+    /**
+     * Affiche une alerte.
+     *
+     * @param type Type de l'alerte
+     * @param title Titre de l'alerte
+     * @param message Message à afficher
+     */
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setHeaderText(title);
@@ -334,6 +374,11 @@ public class VueCalendrier {
         alert.showAndWait();
     }
 
+    /**
+     * Retourne le mois et l'année actuellement affichés.
+     *
+     * @return Le YearMonth courant
+     */
     public YearMonth getCurrentYearMonth() {
         return currentYearMonth;
     }

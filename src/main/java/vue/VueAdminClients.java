@@ -1,6 +1,7 @@
 package vue;
 
 import controleur.ControleurAdminClients;
+import controleur.ControleurFactures;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,13 +11,24 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import modele.Client;
 import modele.Utilisateur;
+import modele.dao.ConnexionBDD;
 
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * VueAdminClients est la vue permettant à l'administrateur
+ * de gérer les clients (ajouter, modifier, supprimer) de l'application.
+ */
 public class VueAdminClients {
 
+    /**
+     * Affiche l'écran de gestion des clients pour l'administrateur.
+     *
+     * @param stage La fenêtre principale JavaFX
+     * @param utilisateur L'utilisateur connecté
+     */
     public static void afficher(Stage stage, Utilisateur utilisateur) {
         stage.setTitle("Gestion des Clients");
 
@@ -58,19 +70,54 @@ public class VueAdminClients {
         navBar.setAlignment(Pos.CENTER);
         navBar.setPadding(new Insets(15));
         navBar.setStyle("-fx-background-color: yellow;");
-        navBar.getChildren().addAll(
-                creerBoutonNavigation("🏠"),
-                creerBoutonNavigation("📅"),
-                creerBoutonNavigation("🛒"),
-                creerBoutonNavigation("👤")
-        );
+
+        Button btnHome = creerBoutonNavigation("🏠");
+        Button btnCalendar = creerBoutonNavigation("📅");
+        Button btnCart = creerBoutonNavigation("🛒");
+        Button btnUser = creerBoutonNavigation("👤");
+
+        navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
         root.setBottom(navBar);
 
-        Scene scene = new Scene(root, 350, 550); // largeur type mobile
+        btnUser.setOnAction(e -> {
+            try {
+                if ("client".equalsIgnoreCase(utilisateur.getRole())) {
+                    VueClient.afficher(new Stage(), utilisateur);
+                } else if ("admin".equalsIgnoreCase(utilisateur.getRole())) {
+                    VueAdmin.afficher(new Stage(), utilisateur);
+                }
+                stage.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        btnCart.setOnAction(e -> {
+            try {
+                ControleurFactures controleurFactures = new ControleurFactures(ConnexionBDD.getConnexion());
+                new VueFactures(controleurFactures, utilisateur);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        btnCalendar.setOnAction(e -> {
+            VueCalendrier vueCal = new VueCalendrier(utilisateur);
+            vueCal.afficher(new Stage());
+            stage.close();
+        });
+
+        Scene scene = new Scene(root, 350, 550);
         stage.setScene(scene);
         stage.show();
     }
 
+    /**
+     * Recharge la liste des clients dans le conteneur donné.
+     *
+     * @param container Le conteneur d'affichage
+     * @param controleur Le contrôleur utilisé pour récupérer les clients
+     */
     private static void rafraichirListeClients(VBox container, ControleurAdminClients controleur) {
         container.getChildren().clear();
         List<Client> clients = controleur.getTousLesClients();
@@ -102,6 +149,12 @@ public class VueAdminClients {
         }
     }
 
+    /**
+     * Affiche une pop-up pour ajouter un client.
+     *
+     * @param controleur Le contrôleur admin client
+     * @param onSuccess Action à exécuter après ajout
+     */
     private static void afficherPopupAjout(ControleurAdminClients controleur, Runnable onSuccess) {
         try {
             Optional<String> mail = champ("Email :");
@@ -121,6 +174,13 @@ public class VueAdminClients {
         }
     }
 
+    /**
+     * Affiche une pop-up pour modifier un client existant.
+     *
+     * @param controleur Le contrôleur admin client
+     * @param client Le client à modifier
+     * @param onSuccess Action à exécuter après modification
+     */
     private static void afficherPopupModification(ControleurAdminClients controleur, Client client, Runnable onSuccess) {
         try {
             Optional<String> mail = champ("Modifier email :", client.getMail());
@@ -140,6 +200,13 @@ public class VueAdminClients {
         }
     }
 
+    /**
+     * Affiche une pop-up de confirmation pour supprimer un client.
+     *
+     * @param controleur Le contrôleur admin client
+     * @param client Le client à supprimer
+     * @param onSuccess Action à exécuter après suppression
+     */
     private static void afficherPopupSuppression(ControleurAdminClients controleur, Client client, Runnable onSuccess) {
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("Supprimer un client");
@@ -158,23 +225,47 @@ public class VueAdminClients {
         }
     }
 
+    /**
+     * Affiche une pop-up pour saisir une valeur texte.
+     *
+     * @param message Le message d'invite
+     * @return Une valeur optionnelle
+     */
     private static Optional<String> champ(String message) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setHeaderText(message);
         return dialog.showAndWait();
     }
 
+    /**
+     * Affiche une pop-up pour saisir une valeur texte avec valeur initiale.
+     *
+     * @param message Le message d'invite
+     * @param valeurInitiale La valeur pré-remplie
+     * @return Une valeur optionnelle
+     */
     private static Optional<String> champ(String message, String valeurInitiale) {
         TextInputDialog dialog = new TextInputDialog(valeurInitiale);
         dialog.setHeaderText(message);
         return dialog.showAndWait();
     }
 
+    /**
+     * Affiche une alerte d'erreur.
+     *
+     * @param msg Le message à afficher
+     */
     private static void alerte(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR, msg);
         alert.showAndWait();
     }
 
+    /**
+     * Crée un bouton de navigation avec un emoji.
+     *
+     * @param emoji L'emoji à afficher
+     * @return Le bouton créé
+     */
     private static Button creerBoutonNavigation(String emoji) {
         Button btn = new Button(emoji);
         btn.setStyle(

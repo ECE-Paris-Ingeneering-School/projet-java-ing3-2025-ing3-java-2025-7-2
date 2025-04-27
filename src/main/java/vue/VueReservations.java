@@ -1,4 +1,3 @@
-// version modifiée pour afficher séparément les réservations passées et à venir
 package vue;
 
 import controleur.ControleurReservations;
@@ -10,12 +9,18 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import modele.Utilisateur;
+import modele.dao.ConnexionBDD;
 
 import java.sql.Connection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * VueReservations est la vue qui permet d'afficher les réservations
+ * d'un utilisateur, séparées entre passées et futures.
+ * Elle permet aussi de supprimer des réservations et de générer une facture.
+ */
 public class VueReservations {
 
     private final Utilisateur utilisateur;
@@ -24,6 +29,12 @@ public class VueReservations {
     private final ControleurReservations controller;
     private final ControleurFactures controleurFactures;
 
+    /**
+     * Constructeur de VueReservations.
+     *
+     * @param utilisateur L'utilisateur connecté
+     * @param connexion La connexion SQL active
+     */
     public VueReservations(Utilisateur utilisateur, Connection connexion) {
         this.utilisateur = utilisateur;
         this.connexion = connexion;
@@ -31,20 +42,34 @@ public class VueReservations {
         this.controleurFactures = new ControleurFactures(connexion);
     }
 
+    /**
+     * Crée un bouton de navigation avec un emoji.
+     *
+     * @param emoji Le symbole du bouton
+     * @return Le bouton stylisé
+     */
     private Button creerBoutonNavigation(String emoji) {
         Button btn = new Button(emoji);
         btn.setStyle(
                 "-fx-background-color: black;" +
-                        "-fx-text-fill: yellow;" +
-                        "-fx-font-size: 18px;" +
-                        "-fx-background-radius: 10;" +
-                        "-fx-min-width: 60px;" +
-                        "-fx-min-height: 60px;" +
-                        "-fx-padding: 10;"
+                "-fx-text-fill: yellow;" +
+                "-fx-font-size: 18px;" +
+                "-fx-background-radius: 10;" +
+                "-fx-min-width: 60px;" +
+                "-fx-min-height: 60px;" +
+                "-fx-padding: 10;"
         );
         return btn;
     }
 
+    /**
+     * Affiche une boîte d'alerte avec un message.
+     *
+     * @param type Type d'alerte (INFO, WARNING, ERROR)
+     * @param title Titre de la fenêtre d'alerte
+     * @param message Message à afficher
+     * @return true si OK cliqué
+     */
     private boolean showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type, message, ButtonType.OK);
         alert.setHeaderText(title);
@@ -52,6 +77,11 @@ public class VueReservations {
         return alert.getResult() == ButtonType.OK;
     }
 
+    /**
+     * Affiche la fenêtre listant les réservations de l'utilisateur.
+     *
+     * @param stage La fenêtre JavaFX
+     */
     public void afficher(Stage stage) {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #d0f5c8;");
@@ -95,7 +125,7 @@ public class VueReservations {
             confirmer.setStyle("-fx-background-color:#e74c3c; -fx-text-fill:white; -fx-font-size:14px; -fx-padding:8 20 8 20;");
             confirmer.setOnAction(e -> {
                 try {
-                    System.out.println("Tentative de génération  facture ");
+                    System.out.println("Tentative de génération facture");
 
                     Integer idFacture = controleurFactures.genererFacture(utilisateur);
                     if (idFacture != null && idFacture > 0) {
@@ -127,13 +157,43 @@ public class VueReservations {
         navBar.setPadding(new Insets(15));
         navBar.setStyle("-fx-background-color:yellow;");
 
-        navBar.getChildren().addAll(
-                creerBoutonNavigation("🏠"),
-                creerBoutonNavigation("📅"),
-                creerBoutonNavigation("🛒"),
-                creerBoutonNavigation("👤")
-        );
+        Button btnHome = creerBoutonNavigation("🏠");
+        Button btnCalendar = creerBoutonNavigation("📅");
+        Button btnCart = creerBoutonNavigation("🛒");
+        Button btnUser = creerBoutonNavigation("👤");
+
+        navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
         root.setBottom(navBar);
+
+        btnUser.setOnAction(e -> {
+            try {
+                if ("client".equalsIgnoreCase(utilisateur.getRole())) {
+                    VueClient.afficher(new Stage(), utilisateur);
+                } else if ("admin".equalsIgnoreCase(utilisateur.getRole())) {
+                    VueAdmin.afficher(new Stage(), utilisateur);
+                }
+                stage.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        btnCart.setOnAction(e -> {
+            try {
+                ControleurFactures controleurFactures = new ControleurFactures(ConnexionBDD.getConnexion());
+                new VueFactures(controleurFactures, utilisateur);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        btnCalendar.setOnAction(e -> {
+            VueCalendrier vueCal = new VueCalendrier(utilisateur);
+            vueCal.afficher(new Stage());
+            stage.close();
+        });
+
+
 
         Scene scene = new Scene(root, 350, 600);
         stage.setTitle("Réservations - " + utilisateur.getPrenom());
@@ -141,6 +201,12 @@ public class VueReservations {
         stage.show();
     }
 
+    /**
+     * Ajoute une réservation à venir avec un bouton de suppression associé.
+     *
+     * @param res La chaîne descriptive de la réservation
+     * @param stage La fenêtre JavaFX
+     */
     private void ajouterReservationAvecSuppression(String res, Stage stage) {
         HBox ligne = new HBox(10);
         ligne.setAlignment(Pos.CENTER_LEFT);

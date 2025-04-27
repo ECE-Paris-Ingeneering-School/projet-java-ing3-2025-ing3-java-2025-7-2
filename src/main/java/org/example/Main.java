@@ -1,28 +1,36 @@
 import controleur.controleur;
 import modele.Admin;
 import modele.modele;
-import javax.swing.*;  import java.awt.*;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 
-
+/**
+ * Classe principale Main pour lancer une simple fenêtre Swing affichant "Hello World".
+ */
 public class Main {
+
+    /**
+     * Point d'entrée de l'application.
+     *
+     * @param args Arguments de la ligne de commande (non utilisés ici)
+     */
     public static void main(String[] args) {
-        // Demande la création de fenêtres décorés
+       
         JFrame.setDefaultLookAndFeelDecorated(true);
 
-        // Créer et configurer un fenêtre d'application
+        
         JFrame frame = new JFrame("HelloWorldSwing");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(new FlowLayout());
 
-        // Ajouter un "label" au contenu du fenêtre
+        
         JLabel label = new JLabel("Hello World");
         frame.getContentPane().add(label);
 
-        // Afficher le fenêtre
-        frame.setSize(200,50);
+       
+        frame.setSize(200, 50);
         frame.setVisible(true);
-
     }
 }
-

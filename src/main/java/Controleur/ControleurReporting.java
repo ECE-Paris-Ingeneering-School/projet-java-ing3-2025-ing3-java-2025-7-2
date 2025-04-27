@@ -8,17 +8,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * ControleurReporting permet de récupérer
+ * les statistiques sur les attractions les plus réservées.
+ */
 public class ControleurReporting {
 
     private AttractionDAO attractionDAO;
 
+    /**
+     * Constructeur du contrôleur de reporting.
+     *
+     * @param attractionDAO DAO des attractions utilisé pour les statistiques
+     */
     public ControleurReporting(AttractionDAO attractionDAO) {
         this.attractionDAO = attractionDAO;
     }
 
-
-     /// Récupère la liste des attractions avec leur nombre de réservations.
-
+    /**
+     * Récupère la liste des attractions avec leur nombre de réservations.
+     *
+     * @return Liste d'attractions avec statistiques de réservations
+     */
     public List<Attraction> getAttractionsAvecReservations() {
         List<Attraction> liste = new ArrayList<>();
         try {
@@ -29,7 +40,7 @@ public class ControleurReporting {
                 attraction.setNombreReservations(entry.getValue());
                 liste.add(attraction);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return liste;

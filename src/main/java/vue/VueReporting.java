@@ -15,14 +15,29 @@ import modele.Utilisateur;
 
 import java.util.List;
 
+/**
+ * VueReporting permet d'afficher un graphique à barres
+ * représentant les statistiques des attractions et leur nombre de réservations.
+ */
 public class VueReporting {
 
     private ControleurReporting controleurReporting;
 
+    /**
+     * Constructeur de VueReporting.
+     *
+     * @param controleurReporting Le contrôleur qui fournit les données de reporting
+     */
     public VueReporting(ControleurReporting controleurReporting) {
         this.controleurReporting = controleurReporting;
     }
 
+    /**
+     * Affiche la fenêtre des statistiques des attractions.
+     *
+     * @param stage La fenêtre JavaFX
+     * @param utilisateur L'utilisateur connecté
+     */
     public void afficher(Stage stage, Utilisateur utilisateur) {
         stage.setTitle("Statistiques des Attractions");
 
@@ -39,6 +54,11 @@ public class VueReporting {
         stage.show();
     }
 
+    /**
+     * Charge les données de réservations et affiche le graphique à barres.
+     *
+     * @param root Le conteneur principal où placer le graphique
+     */
     private void chargerStats(BorderPane root) {
         List<Attraction> attractions = controleurReporting.getAttractionsAvecReservations();
 
