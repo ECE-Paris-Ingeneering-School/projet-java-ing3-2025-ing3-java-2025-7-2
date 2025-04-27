@@ -135,7 +135,7 @@ public class VueReservations {
         );
         root.setBottom(navBar);
 
-        Scene scene = new Scene(root, 350, 550);
+        Scene scene = new Scene(root, 350, 600);
         stage.setTitle("Réservations - " + utilisateur.getPrenom());
         stage.setScene(scene);
         stage.show();
