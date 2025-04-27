@@ -8,13 +8,26 @@ import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe DAO pour gérer les évènements dans la BDD
+ */
 public class EvenementDAO {
     private static Connection conn;
 
+    /**
+     * Constructeur DAO avec la connexion à la BDD
+     * @param conn connexion active à la BDD
+     */
     public EvenementDAO(Connection conn) {
         this.conn = conn;
     }
 
+    /**
+     * Récupère les événements dont les dates de début ou de fin sont comprises dans le mois donné
+     *
+     * @param yearMonth Mois et année ciblés
+     * @return Liste de descriptions des événements
+     */
     public List<String> getEvenementsForMonth(YearMonth yearMonth) throws SQLException {
         List<String> evenements = new ArrayList<>();
         String sql = "SELECT nom, dateDebut, dateFin FROM evenement WHERE (dateDebut BETWEEN ? AND ?) OR (dateFin BETWEEN ? AND ?)";
@@ -37,7 +50,12 @@ public class EvenementDAO {
         return evenements;
     }
 
-    // Nouvelle méthode pour récupérer les événements pour un jour donné
+    /**
+     * Récupère les événements actifs pour un jour donné
+     *
+     * @param date Date pour laquelle récupérer les événements
+     * @return Liste de descriptions des événements
+     */
     public List<String> getEvenementsForDay(LocalDate date) throws SQLException {
         List<String> evenements = new ArrayList<>();
         String sql = "SELECT nom, dateDebut, dateFin FROM evenement WHERE dateDebut <= ? AND dateFin >= ?";
@@ -56,7 +74,14 @@ public class EvenementDAO {
         return evenements;
     }
 
-    // Ajouter un événement
+    /**
+     * Ajoute un nouvel événement dans la base de données.
+     *
+     * @param nom  Nom de l'événement
+     * @param supplement Supplément de l'événement
+     * @param dateDebut Date de début de l'événement
+     * @param dateFin Date de fin de l'événement
+     */
     public void ajouterEvenement(String nom, double supplement, Date dateDebut, Date dateFin) throws SQLException {
         String sql = "INSERT INTO evenement (nom, supplement, dateDebut, dateFin) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -68,7 +93,16 @@ public class EvenementDAO {
         }
     }
 
-    // Modifier un événement
+
+    /**
+     * Modifie un événement existant dans la base de données
+     *
+     * @param idEvenement Identifiant de l'événement
+     * @param nom Nouveau nom de l'événement
+     * @param supplement Nouveau supplément tarifaire
+     * @param dateDebut Nouvelle date de début
+     * @param dateFin Nouvelle date de fin
+     */
     public void modifierEvenement(int idEvenement, String nom, double supplement, Date dateDebut, Date dateFin) throws SQLException {
         String sql = "UPDATE evenement SET nom = ?, supplement = ?, dateDebut = ?, dateFin = ? WHERE idEvenement = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -81,7 +115,11 @@ public class EvenementDAO {
         }
     }
 
-    // Supprimer un événement
+    /**
+     * Supprime un événement de la base de données.
+     *
+     * @param idEvenement Identifiant de l'événement à supprimer
+     */
     public void supprimerEvenement(int idEvenement) throws SQLException {
         String sql = "DELETE FROM evenement WHERE idEvenement = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -90,7 +128,11 @@ public class EvenementDAO {
         }
     }
 
-    // Récupérer tous les événements
+    /**
+     * Récupère la liste de tous les événements stockés dans la base de données.
+     *
+     * @return Liste d'objets {@link Evenement}
+     */
     public static List<Evenement> getAllEvenements() throws SQLException {
         List<Evenement> evenements = new ArrayList<>();
         String sql = "SELECT * FROM evenement";
@@ -109,6 +151,12 @@ public class EvenementDAO {
         return evenements;
     }
 
+    /**
+     * Récupère un événement à partir de son identifiant.
+     *
+     * @param idEvenement Identifiant de l'événement
+     * @return L'objet {@link Evenement} correspondant, ou null s'il n'existe pas
+     */
     public Evenement getEvenementParId(int idEvenement) throws SQLException {
         String sql = "SELECT * FROM evenement WHERE idEvenement = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -129,6 +177,12 @@ public class EvenementDAO {
     }
 
 
+    /**
+     * Récupère un événement actif pour une date spécifique (entre dateDebut et dateFin).
+     *
+     * @param date Date à vérifier
+     * @return L'objet {@link Evenement} correspondant, ou null si aucun événement trouvé
+     */
     public Evenement getEvenementParDate(LocalDate date) {
         String sql = "SELECT * FROM evenement WHERE dateDebut <= ? AND dateFin >= ?";
 
@@ -150,6 +204,7 @@ public class EvenementDAO {
                 evt.setDateDebut(rs.getDate("dateDebut"));
                 evt.setDateFin(rs.getDate("dateFin"));
 
+                // Affiche l'évènement si trouvé
                 System.out.println("✅ Événement trouvé : " + evt.getNom() + " | Supplément : " + evt.getSupplement());
                 return evt;
             } else {

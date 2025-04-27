@@ -8,8 +8,17 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Classe DAO pour gérer les opérations d'accés aux données lié aux admins et attractions
+ */
 public class AdminDAO {
 
+    /**
+     * Récupère la liste de tous les admins présents dans la BDD
+     *
+     * @return une liste d'objects {@link Admin} représentant tous les admins
+     */
     public List<Admin> getAllAdmins() {
         List<Admin> admins = new ArrayList<>();
 
@@ -35,9 +44,11 @@ public class AdminDAO {
         return admins;
     }
 
-    /// ajout / suppr client ?
-    /// ajout / suppr attractions / evenements ?
 
+    /**
+     * Modifie les informations d'une attraction déjà présente dans la BDD
+     * @param attraction l'object {@link Attraction} contenant les informations à mettre à jour
+     */
     public void modifAttraction(Attraction attraction) {
         try (Connection conn = ConnexionBDD.getConnexion()) {
             String sql = "UPDATE attractions SET nom = ?, prix = ?, description = ? WHERE id = ?";
