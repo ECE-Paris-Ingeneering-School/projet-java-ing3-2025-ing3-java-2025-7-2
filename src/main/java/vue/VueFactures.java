@@ -4,11 +4,12 @@ import controleur.ControleurFactures;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import modele.Utilisateur;
 
@@ -34,15 +35,22 @@ public class VueFactures {
 
         TableView<FactureFX> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setPrefHeight(340);
 
         TableColumn<FactureFX, Integer> idCol = new TableColumn<>("ID Facture");
         idCol.setCellValueFactory(new PropertyValueFactory<>("idFacture"));
+        idCol.setStyle("-fx-font-weight: bold; -fx-alignment: CENTER;");
+        idCol.setPrefWidth(80);
 
         TableColumn<FactureFX, Date> dateCol = new TableColumn<>("Date");
         dateCol.setCellValueFactory(new PropertyValueFactory<>("dateFacture"));
+        dateCol.setStyle("-fx-alignment: CENTER;");
+        dateCol.setPrefWidth(110);
 
         TableColumn<FactureFX, Double> prixCol = new TableColumn<>("Prix (€)");
         prixCol.setCellValueFactory(new PropertyValueFactory<>("prix"));
+        prixCol.setStyle("-fx-alignment: CENTER;");
+        prixCol.setPrefWidth(80);
 
         table.getColumns().addAll(idCol, dateCol, prixCol);
 
@@ -55,16 +63,28 @@ public class VueFactures {
             double prix = (double) f[2];
             donnees.add(new FactureFX(id, date, prix));
         }
-
         table.setItems(donnees);
 
-        VBox root = new VBox(table);
-        root.setPadding(new Insets(10));
-        Scene scene = new Scene(root, 500, 400);
+        Label titre = new Label("Mes factures");
+        titre.setFont(Font.font("Arial", 22));
+        titre.setStyle("-fx-text-fill: #2c3e50;");
+        titre.setAlignment(Pos.CENTER);
+        titre.setMaxWidth(Double.MAX_VALUE);
 
+        VBox contenu = new VBox(18, titre, table);
+        contenu.setAlignment(Pos.TOP_CENTER);
+        contenu.setPadding(new Insets(15, 10, 15, 10));
+
+
+        BorderPane root = new BorderPane();
+        root.setStyle("-fx-background-color: #d0f5c8;");
+        root.setCenter(contenu);
+
+        Scene scene = new Scene(root, 400, 400); // format mobile
         stage.setScene(scene);
         stage.show();
     }
+
 
     // Classe interne pour lier les données à la vue
     public static class FactureFX {
