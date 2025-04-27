@@ -23,6 +23,10 @@ import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * VueCalendrier et la vue permettant d'afficher un calendrier interactif,
+ * avec navigation par Mois et affichage des attractions disponibles pour un utilisateur.
+ */
 public class VueCalendrier {
 
     private Calendrier controller;
@@ -34,19 +38,29 @@ public class VueCalendrier {
     private Stage stage;
     private ControleurEvenement controleurEvenement;
 
+    /**
+     * Constructeur de VueCalendrier.
+     *
+     * @param utilisateur L'utilisateur actuellement connecté
+     */
     public VueCalendrier(Utilisateur utilisateur) {
         this.utilisateurConnecte = utilisateur;
         this.controller = new Calendrier(this);
         this.controleurEvenement = new ControleurEvenement();
     }
 
+    /**
+     * Affiche la fenêtre du calendrier.
+     *
+     * @param stage La fenêtre JavaFX à utiliser
+     */
     public void afficher(Stage stage) {
         this.stage = stage;
 
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #d0f5c8;"); // fond vert clair Jurassic Park
+        root.setStyle("-fx-background-color: #d0f5c8;"); // fond vert clair
 
-        // ===== Titre du mois et navigation =====
+        // Titre du mois et navigation
         HBox topPanel = new HBox(10);
         topPanel.setAlignment(Pos.CENTER);
         topPanel.setPadding(new Insets(10));
@@ -62,7 +76,7 @@ public class VueCalendrier {
 
         topPanel.getChildren().addAll(prevButton, monthLabel, nextButton);
 
-        // ===== Grille calendrier =====
+        // Grille calendrier
         calendarGrid = new GridPane();
         calendarGrid.setHgap(5);
         calendarGrid.setVgap(5);
@@ -72,12 +86,12 @@ public class VueCalendrier {
         calendarScroll.setFitToWidth(true);
         calendarScroll.setStyle("-fx-background-color: transparent;");
 
-        // ===== Panel réservation =====
+        // Panel réservation
         reservationPanel = new VBox(10);
         reservationPanel.setPadding(new Insets(10));
         reservationPanel.setStyle("-fx-border-color: gray; -fx-border-width: 1;");
 
-        // ===== Bouton voir réservations =====
+        // Bouton voir réservations
         Button voirReservationsBtn = new Button("Voir mes réservations");
         voirReservationsBtn.setStyle(
                 "-fx-background-color: #3498db;" +
@@ -96,12 +110,11 @@ public class VueCalendrier {
             }
         });
 
-
         VBox centerContent = new VBox(10, topPanel, calendarScroll, reservationPanel, voirReservationsBtn);
         centerContent.setAlignment(Pos.TOP_CENTER);
         centerContent.setPadding(new Insets(10));
 
-        // ===== Barre de navigation mobile en bas =====
+        // Barre de navigation en bas
         HBox navBar = new HBox(15);
         navBar.setAlignment(Pos.CENTER);
         navBar.setPadding(new Insets(15));
@@ -114,18 +127,17 @@ public class VueCalendrier {
 
         navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
 
-        ///  RAFRAICHISSEMENT APGE
+        // Bouton navigation actuelle (rafraîchir calendrier)
         btnCalendar.setOnAction(e -> {
-            this.afficher(new Stage());  // relance la page actuelle
+            this.afficher(new Stage());
             stage.close();
         });
-        //parcours icone du bas
+
         btnUser.setOnAction(e -> {
             try {
                 if ("client".equalsIgnoreCase(utilisateurConnecte.getRole())) {
                     VueClient.afficher(new Stage(), utilisateurConnecte);
-                }
-                else if ("admin".equalsIgnoreCase(utilisateurConnecte.getRole())) {
+                } else if ("admin".equalsIgnoreCase(utilisateurConnecte.getRole())) {
                     VueAdmin.afficher(new Stage(), utilisateurConnecte);
                 }
                 stage.close();
@@ -133,19 +145,16 @@ public class VueCalendrier {
                 ex.printStackTrace();
             }
         });
-        btnCart.setOnAction(e ->{
+
+        btnCart.setOnAction(e -> {
             try {
-                ControleurFactures controleurFactures = new ControleurFactures(ConnexionBDD.getConnexion()); // adapte si c’est déjà instancié ailleurs
-                new VueFactures(controleurFactures, utilisateurConnecte); // ouvre la vue des factures
-               /// stage.close()
-                /// ==> Fenêtre sans barre de navigation donc on la laisse en popup jusqu'à implémentation
+                ControleurFactures controleurFactures = new ControleurFactures(ConnexionBDD.getConnexion());
+                new VueFactures(controleurFactures, utilisateurConnecte);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-
         });
 
-        // ===== Placement dans BorderPane =====
         root.setCenter(centerContent);
         root.setBottom(navBar);
 
@@ -157,6 +166,12 @@ public class VueCalendrier {
         stage.show();
     }
 
+    /**
+     * Crée un bouton de navigation avec un emoji.
+     *
+     * @param emoji Le symbole à afficher
+     * @return Le bouton configuré
+     */
     private Button creerBoutonNavigation(String emoji) {
         Button btn = new Button(emoji);
         btn.setStyle(
@@ -171,7 +186,11 @@ public class VueCalendrier {
         return btn;
     }
 
-
+    /**
+     * Affiche les jours du mois sélectionné.
+     *
+     * @param yearMonth Le mois à afficher
+     */
     public void displayMonth(YearMonth yearMonth) {
         this.currentYearMonth = yearMonth;
         monthLabel.setText(yearMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.FRENCH) + " " + yearMonth.getYear());
@@ -186,7 +205,7 @@ public class VueCalendrier {
         }
 
         LocalDate firstDay = yearMonth.atDay(1);
-        int startDayOfWeek = firstDay.getDayOfWeek().getValue(); // Lundi = 1
+        int startDayOfWeek = firstDay.getDayOfWeek().getValue();
 
         int row = 1;
         int col = startDayOfWeek - 1;
@@ -199,69 +218,21 @@ public class VueCalendrier {
             dayBtn.setMaxWidth(Double.MAX_VALUE);
 
             if (joursEvenements.contains(date)) {
-                //System.out.println(date);
-                if(controleurEvenement.getIDEvenementParDate(date) == 1){
-                    dayBtn.setStyle("-fx-background-color: #ff0000; -fx-text-fill: white;");
+                int id = controleurEvenement.getIDEvenementParDate(date);
+                switch (id) {
+                    case 1 -> dayBtn.setStyle("-fx-background-color: #ff0000; -fx-text-fill: white;");
+                    case 2 -> dayBtn.setStyle("-fx-background-color: #11ff00; -fx-text-fill: white;");
+                    case 3 -> dayBtn.setStyle("-fx-background-color: #fd7200; -fx-text-fill: white;");
+                    case 4 -> dayBtn.setStyle("-fx-background-color: #00ffd9; -fx-text-fill: white;");
+                    case 5 -> dayBtn.setStyle("-fx-background-color: #ff00dd; -fx-text-fill: white;");
+                    case 6 -> dayBtn.setStyle("-fx-background-color: #002aff; -fx-text-fill: white;");
+                    default -> dayBtn.setStyle("-fx-background-color: orange; -fx-text-fill: white;");
                 }
-                else if(controleurEvenement.getIDEvenementParDate(date) == 2){
-                    dayBtn.setStyle("-fx-background-color: #11ff00; -fx-text-fill: white;");
-                }
-
-                else if(controleurEvenement.getIDEvenementParDate(date) == 3){
-                    dayBtn.setStyle("-fx-background-color:  #fd7200; -fx-text-fill: white;");
-                }
-
-                else if(controleurEvenement.getIDEvenementParDate(date) == 4){
-                    dayBtn.setStyle("-fx-background-color: #00ffd9; -fx-text-fill: white;");
-                }
-
-                else if(controleurEvenement.getIDEvenementParDate(date) == 5){
-                    dayBtn.setStyle("-fx-background-color: #ff00dd; -fx-text-fill: white;");
-                }
-
-                else if(controleurEvenement.getIDEvenementParDate(date) == 6){
-                    dayBtn.setStyle("-fx-background-color: #002aff; -fx-text-fill: white;");
-                }
-                else{
-                    dayBtn.setStyle("-fx-background-color: orange; -fx-text-fill: white;");
-
-                }
-
             }
 
             if (date.isBefore(LocalDate.now())) {
                 dayBtn.setDisable(true);
                 dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: darkgray;");
-                if (joursEvenements.contains(date)) {
-                    //System.out.println(date);
-                    if(controleurEvenement.getIDEvenementParDate(date) == 1){
-                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: #ff0000;");
-                    }
-                    else if(controleurEvenement.getIDEvenementParDate(date) == 2){
-                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: #11ff00;");
-                    }
-
-                    else if(controleurEvenement.getIDEvenementParDate(date) == 3){
-                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: #fd7200;");
-                    }
-
-                    else if(controleurEvenement.getIDEvenementParDate(date) == 4){
-                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: #00ffd9;");
-                    }
-
-                    else if(controleurEvenement.getIDEvenementParDate(date) == 5){
-                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: #ff00dd;");
-                    }
-
-                    else if(controleurEvenement.getIDEvenementParDate(date) == 6){
-                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: #002aff;");
-                    }
-                    else{
-                        dayBtn.setStyle("-fx-background-color: lightgray; -fx-text-fill: orange;");
-
-                    }
-
-                }
             } else {
                 dayBtn.setOnAction(e -> showDayAttractions(date));
             }
@@ -276,11 +247,20 @@ public class VueCalendrier {
         }
     }
 
-
+    /**
+     * Navigue vers un autre mois.
+     *
+     * @param delta Le décalage en mois (+1 ou -1)
+     */
     private void navigationparMois(int delta) {
         displayMonth(currentYearMonth.plusMonths(delta));
     }
 
+    /**
+     * Affiche les attractions disponibles pour un jour donné.
+     *
+     * @param date La date sélectionnée
+     */
     private void showDayAttractions(LocalDate date) {
         reservationPanel.getChildren().clear();
 
@@ -303,11 +283,9 @@ public class VueCalendrier {
 
             reserveBtn.setOnAction(e -> {
                 String selected = attractionCombo.getValue();
-
-                if(date.isBefore(LocalDate.now())) {
-                    showAlert(Alert.AlertType.WARNING,"Erreur","Cette date est dépassée");
-                }
-                else{
+                if (date.isBefore(LocalDate.now())) {
+                    showAlert(Alert.AlertType.WARNING, "Erreur", "Cette date est dépassée");
+                } else {
                     boolean ok = controller.reserverAttraction(selected, date, utilisateurConnecte);
                     if (ok) {
                         showAlert(Alert.AlertType.INFORMATION, "Succès", "Réservation ajoutée pour " + selected);
@@ -315,9 +293,7 @@ public class VueCalendrier {
                         showAlert(Alert.AlertType.WARNING, "Erreur", "Réservation impossible (rôle ou erreur BDD).");
                     }
                 }
-
             });
-
 
             reservationPanel.getChildren().addAll(
                     new Label("Attractions disponibles le " + date + " :"),
@@ -327,6 +303,13 @@ public class VueCalendrier {
         }
     }
 
+    /**
+     * Affiche une alerte.
+     *
+     * @param type Type de l'alerte
+     * @param title Titre de l'alerte
+     * @param message Message à afficher
+     */
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setHeaderText(title);
@@ -334,6 +317,11 @@ public class VueCalendrier {
         alert.showAndWait();
     }
 
+    /**
+     * Retourne le mois et l'année actuellement affichés.
+     *
+     * @return Le YearMonth courant
+     */
     public YearMonth getCurrentYearMonth() {
         return currentYearMonth;
     }
