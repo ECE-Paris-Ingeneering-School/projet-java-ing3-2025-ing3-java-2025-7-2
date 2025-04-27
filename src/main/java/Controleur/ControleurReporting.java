@@ -16,10 +16,9 @@ public class ControleurReporting {
         this.attractionDAO = attractionDAO;
     }
 
-    /**
-     * Récupère la liste des attractions avec leur nombre de réservations.
-     * @return liste des attractions avec le nombre de réservations renseigné
-     */
+
+     /// Récupère la liste des attractions avec leur nombre de réservations.
+
     public List<Attraction> getAttractionsAvecReservations() {
         List<Attraction> liste = new ArrayList<>();
         try {
@@ -30,7 +29,7 @@ public class ControleurReporting {
                 attraction.setNombreReservations(entry.getValue());
                 liste.add(attraction);
             }
-        } catch (Exception e) {
+        }catch (Exception e) {
             e.printStackTrace();
         }
         return liste;

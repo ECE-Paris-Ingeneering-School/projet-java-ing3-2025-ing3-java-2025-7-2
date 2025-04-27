@@ -2,7 +2,7 @@ package controleur;
 
 import modele.Utilisateur;
 import java.sql.*;
-
+                                                                    /// A SUPPR
 public class AuthentificationService {
 
     ///  A ETE DEPLACE VERS LE MODELE (ou la fct est sensee etre)

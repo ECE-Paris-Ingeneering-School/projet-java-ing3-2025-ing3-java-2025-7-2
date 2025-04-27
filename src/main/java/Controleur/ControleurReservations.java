@@ -13,7 +13,8 @@ import java.util.Map;
 
 public class ControleurReservations {
 
-    public List<String> getReservationsPour(Utilisateur utilisateur) {
+    public List<String> getReservationsPour(Utilisateur utilisateur) {  /// retourn reserv selon objet utilisateur passé en paramètre
+                                                                            /// ancienne méthode, plus utilisée dans les dernières versions
         try (Connection conn = ConnexionBDD.getConnexion()) {
             ReservationDAO dao = new ReservationDAO(conn);
             Date today = Date.valueOf(LocalDate.now());
@@ -23,7 +24,6 @@ public class ControleurReservations {
             return new ArrayList<>();
         }
     }
-
     public boolean supprimerReservation(int idReservation) {
         System.out.println("debug du suppr, id reservation: " + idReservation);
 
@@ -46,7 +46,6 @@ public class ControleurReservations {
             return null;
         }
     }
-
     public Map<String, Object> getFactureDetails(int idFacture) {
         try (Connection conn = ConnexionBDD.getConnexion()) {
             ReservationDAO dao = new ReservationDAO(conn);
@@ -56,6 +55,7 @@ public class ControleurReservations {
             return null;
         }
     }
+
 
     public List<String> getReservationsFutures(Utilisateur utilisateur) {
         try (Connection conn = ConnexionBDD.getConnexion()) {
@@ -67,7 +67,6 @@ public class ControleurReservations {
             return new ArrayList<>();
         }
     }
-
     public List<String> getReservationsPassees(Utilisateur utilisateur) {
         try (Connection conn = ConnexionBDD.getConnexion()) {
             ReservationDAO dao = new ReservationDAO(conn);

@@ -57,8 +57,8 @@ public class VueCalendrier {
         monthLabel = new Label();
         monthLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        prevButton.setOnAction(e -> navigateMonth(-1));
-        nextButton.setOnAction(e -> navigateMonth(1));
+        prevButton.setOnAction(e -> navigationparMois(-1));
+        nextButton.setOnAction(e -> navigationparMois(1));
 
         topPanel.getChildren().addAll(prevButton, monthLabel, nextButton);
 
@@ -277,7 +277,7 @@ public class VueCalendrier {
     }
 
 
-    private void navigateMonth(int delta) {
+    private void navigationparMois(int delta) {
         displayMonth(currentYearMonth.plusMonths(delta));
     }
 

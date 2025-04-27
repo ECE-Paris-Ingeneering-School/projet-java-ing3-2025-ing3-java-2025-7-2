@@ -18,12 +18,12 @@ public class ControleurFactures {
 
     private final FactureDAO factureDAO;
     private final ReservationDAO reservationDAO;
-    private final ClientDAO clientDAO; // ✅ DÉCLARATION ajoutée
+    private final ClientDAO clientDAO; // DECLA ajoutée
 
     public ControleurFactures(Connection connexion) {
         this.factureDAO = new FactureDAO(connexion);
         this.reservationDAO = new ReservationDAO(connexion);
-        this.clientDAO = new ClientDAO(); // ✅ INSTANTIATION ajoutée (sans paramètre car elle appelle ConnexionBDD à l’intérieur)
+        this.clientDAO = new ClientDAO(); // INSTANTIATION ajoutée (sans paramètre car  appelle ConnexionBDD à l’intérieur)
     }
 
     public int genererFacture(Utilisateur utilisateur) throws Exception {
@@ -36,6 +36,7 @@ public class ControleurFactures {
         List<Object[]> reservations = reservationDAO.getReservationsPasseesPourFacturation(client.getId());
         System.out.println("Tentative de génération  facture - controleur pre return -");
         return factureDAO.genererFacture(client.getId(), age, reservations);
+
     }
 
     public List<Object[]> getFacturesDuClient(Utilisateur utilisateur) throws SQLException, IOException, ClassNotFoundException {

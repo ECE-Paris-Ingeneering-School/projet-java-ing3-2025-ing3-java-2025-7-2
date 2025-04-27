@@ -15,7 +15,7 @@ public class ControleurEvenement {
 
     private EvenementDAO evenementDAO;
 
-    public ControleurEvenement() {
+    public ControleurEvenement(){
         try {
             this.evenementDAO = new EvenementDAO(ConnexionBDD.getConnexion());
         } catch (Exception e) {
@@ -23,8 +23,9 @@ public class ControleurEvenement {
         }
     }
 
-    public List<LocalDate> getDatesAvecEvenements(YearMonth yearMonth) {
-        List<LocalDate> dates = new ArrayList<>();
+    public List<LocalDate> getDatesAvecEvenements(YearMonth yearMonth){
+
+       List<LocalDate> dates = new ArrayList<>();
         try {
             List<String> evenements = evenementDAO.getEvenementsForMonth(yearMonth);
             for (String evt : evenements) {
@@ -38,14 +39,14 @@ public class ControleurEvenement {
                     start = start.plusDays(1);
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e){
+           e.printStackTrace();
         }
         return dates;
     }
 
-    public Integer getIDEvenementParDate(LocalDate date) {
-        try {
+    public Integer getIDEvenementParDate(LocalDate date){
+        try{
             List<Evenement> evenements = EvenementDAO.getAllEvenements();
 
             for(Evenement ev : evenements) {
@@ -59,7 +60,7 @@ public class ControleurEvenement {
                }
             }
 
-        } catch (SQLException e) {
+        }catch (SQLException e) {
             e.printStackTrace();
         }
     return null;

@@ -13,13 +13,12 @@ public class ControleurUtilisateur {
     public String getNomComplet() {
         return utilisateur.getPrenom() + " " + utilisateur.getNom();
     }
-
     public String getEmail() {
         return utilisateur.getEmail();
     }
-
     public String getRole() {
         return utilisateur.getRole();
+
     }
 
     // Tu peux ajouter ici d'autres données à afficher (historique, stats, etc.)
