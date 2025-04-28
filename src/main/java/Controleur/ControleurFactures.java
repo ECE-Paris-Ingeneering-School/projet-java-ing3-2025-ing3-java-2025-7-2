@@ -48,6 +48,8 @@ public class ControleurFactures {
         System.out.println("Tentative de génération facture - controleur age : " + age);
         List<Object[]> reservations = reservationDAO.getReservationsPasseesPourFacturation(client.getId());
         System.out.println("Tentative de génération facture - controleur pre return -");
+
+
         return factureDAO.genererFacture(client.getId(), age, reservations);
     }
 

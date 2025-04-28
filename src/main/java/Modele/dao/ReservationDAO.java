@@ -400,9 +400,11 @@ public class ReservationDAO {
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idClient);
+            System.out.println("Executing query for idClient = " + idClient);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
+                System.out.println("Found reservation: idReservation=" + rs.getInt("idReservation"));
                 Object[] ligne = new Object[4];
                 ligne[0] = rs.getInt("idReservation");
                 ligne[1] = rs.getString("nom");
@@ -414,7 +416,9 @@ public class ReservationDAO {
             e.printStackTrace();
         }
 
+        System.out.println("Total reservations trouvées : " + reservations.size());
         return reservations;
     }
+
 
 }

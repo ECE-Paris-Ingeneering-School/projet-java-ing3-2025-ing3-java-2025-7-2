@@ -83,6 +83,7 @@ public class VueAdmin {
         btnAttractions.setOnAction(e -> {
             try {
                 VueAdminAttractions.afficher(new Stage(), utilisateur);
+                stage.close();
             } catch (SQLException | IOException | ClassNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
@@ -90,6 +91,7 @@ public class VueAdmin {
 
         btnClients.setOnAction(e -> {
             VueAdminClients.afficher(new Stage(), utilisateur);
+            stage.close();
         });
 
         btnReporting.setOnAction(e -> {
@@ -98,6 +100,7 @@ public class VueAdmin {
                 ControleurReporting controleurReporting = new ControleurReporting(attractionDAO);
                 VueReporting vueReporting = new VueReporting(controleurReporting);
                 vueReporting.afficher(new Stage(), utilisateur);
+                stage.close();
             } catch (SQLException | IOException | ClassNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
@@ -105,6 +108,7 @@ public class VueAdmin {
         btnEvenements.setOnAction(e -> {
             try {
                 VueAdminEvenements.afficher(new Stage(), utilisateur);
+                //stage.close(); pas le droit sinon ca ferme tout
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             } catch (IOException ex) {
