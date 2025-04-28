@@ -303,12 +303,16 @@ public class ReservationDAO {
                 "JOIN attraction a ON r.idAttraction = a.idAttraction " +
                 "WHERE r.idClient = ? AND r.dateAttraction <= ? ORDER BY r.dateAttraction DESC";
 
+
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idClient);
             stmt.setDate(2, today);
 
             EvenementDAO evenementDAO = new EvenementDAO(ConnexionBDD.getConnexion());
             ResultSet rs = stmt.executeQuery();
+
+            System.out.println("fct dans dao - avant while");
+
             while (rs.next()) {
                 int id = rs.getInt("idReservation");
                 String nom = rs.getString("nom");
@@ -325,6 +329,7 @@ public class ReservationDAO {
                 if (evt != null) {
                     prixFinal += evt.getSupplement();
                 }
+                reservations.add("Attraction: " + nom + " (" + date + ") - Prix : " + prixFinal + " €  # " + id);
 
             }
 

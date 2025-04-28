@@ -106,6 +106,12 @@ public class VueAdminClients {
             vueCal.afficher(new Stage());
             stage.close();
         });
+        btnHome.setOnAction(e -> {
+            VueAccueil vueAccueil = new VueAccueil (utilisateur); // Pas besoin de passer d’utilisateur
+            vueAccueil.afficher(new Stage());         // Affiche dans une nouvelle fenêtre
+            // Optionnel : stage.close(); // Si tu veux fermer la page actuelle
+            stage.close();
+        });
 
         Scene scene = new Scene(root, 350, 550);
         stage.setScene(scene);

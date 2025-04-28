@@ -111,6 +111,7 @@ public class ControleurReservations {
         try (Connection conn = ConnexionBDD.getConnexion()) {
             ReservationDAO dao = new ReservationDAO(conn);
             Date today = Date.valueOf(LocalDate.now());
+            System.out.println("Controleur fonctionnel");
             return dao.getReservationsDetailsParClientEtDatePassee(utilisateur.getId(), today);
         } catch (Exception e) {
             e.printStackTrace();

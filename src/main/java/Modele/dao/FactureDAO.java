@@ -38,7 +38,7 @@ public class FactureDAO {
         double total = 0;
         double reduction = 0.0;
         int reservationsDansLeMois = 0;
-
+        System.out.println("objet res : " + reservations);
         LocalDate today = LocalDate.now();
         YearMonth moisActuel = YearMonth.from(today);
 
@@ -54,7 +54,6 @@ public class FactureDAO {
                 }
             }
         }
-
         // réduction enfant ou sénior
         if (age < 12 || age > 60) {
             reduction += 0.15;

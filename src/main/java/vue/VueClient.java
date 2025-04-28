@@ -69,13 +69,18 @@ public class VueClient {
         Button btnCalendar = creerBoutonNavigation("📅");
         Button btnCart = creerBoutonNavigation("🛒");
         Button btnUser = creerBoutonNavigation("👤");
+        navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
 
         btnCalendar.setOnAction(e -> {
             VueCalendrier vueCal = new VueCalendrier(utilisateur);
             vueCal.afficher(new Stage());
             stage.close();
         });
-
+        btnHome.setOnAction(e -> {
+            VueAccueil vueAccueil = new VueAccueil (utilisateur); // Pas besoin de passer d’utilisateur
+            vueAccueil.afficher(new Stage());         // Affiche dans une nouvelle fenêtre
+            // Optionnel : stage.close(); // Si tu veux fermer la page actuelle
+        });
         btnCart.setOnAction(e -> {
             try {
                 ControleurFactures controleurFactures = new ControleurFactures(ConnexionBDD.getConnexion());
@@ -85,7 +90,6 @@ public class VueClient {
             }
         });
 
-        navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
 
         BorderPane root = new BorderPane();
         root.setCenter(mainLayout);

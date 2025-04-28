@@ -1,5 +1,6 @@
 package vue;
 
+import controleur.ControleurFactures;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,6 +11,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import modele.Utilisateur;
+import modele.dao.ConnexionBDD;
 
 public class VueAccueil {
 
@@ -78,9 +80,11 @@ public class VueAccueil {
         );
 
         btnAttractions.setOnAction(e -> {
+            System.out.println("Voir les attractions");
             // Ouvre la page Attractions
             try {
                 VueListeAttractions.afficher(new Stage(), utilisateur);
+                stage.close();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -95,12 +99,43 @@ public class VueAccueil {
         navBar.setAlignment(Pos.CENTER);
         navBar.setPadding(new Insets(15));
         navBar.setStyle("-fx-background-color: yellow;");
-        navBar.getChildren().addAll(
-                creerBoutonNavigation("🏠"),
-                creerBoutonNavigation("📅"),
-                creerBoutonNavigation("🛒"),
-                creerBoutonNavigation("👤")
-        );
+
+        Button btnHome = creerBoutonNavigation("🏠");
+        Button btnCalendar = creerBoutonNavigation("📅");
+        Button btnCart = creerBoutonNavigation("🛒");
+        Button btnUser = creerBoutonNavigation("👤");
+        navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);
+
+        btnCalendar.setOnAction(e -> {
+            VueCalendrier vueCal = new VueCalendrier(utilisateur);
+            vueCal.afficher(new Stage());
+            stage.close();
+        });
+
+        btnCart.setOnAction(e -> {
+            try {
+                ControleurFactures controleurFactures = new ControleurFactures(ConnexionBDD.getConnexion());
+                new VueFactures(controleurFactures, utilisateur);
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        //parcours icone du bas
+        btnUser.setOnAction(e -> {
+            try {
+                if ("client".equalsIgnoreCase(utilisateur.getRole())) {
+                    VueClient.afficher(new Stage(), utilisateur);
+                }
+                else if ("admin".equalsIgnoreCase(utilisateur.getRole())) {
+                    VueAdmin.afficher(new Stage(), utilisateur);
+                }
+                stage.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
 
         // BorderPane principal
         BorderPane root = new BorderPane();

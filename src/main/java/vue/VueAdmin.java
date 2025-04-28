@@ -67,16 +67,16 @@ public class VueAdmin {
         Button btnAttractions = new Button("🎢 Attractions");
         Button btnClients = new Button("👥 Clients");
         Button btnEvenements = new Button("🎉 Événements");
-        Button btnFactures = new Button("÷ Factures");
-        Button btnReservations = new Button("📆 Réservations");
+        //Button btnFactures = new Button("÷ Factures");
+        //Button btnReservations = new Button("📆 Réservations");
         Button btnReporting = new Button("\uD83D\uDCF6 Statistiques");
 
-        for (Button btn : new Button[]{btnAttractions, btnClients, btnEvenements, btnFactures, btnReservations, btnReporting}) {
+        for (Button btn : new Button[]{btnAttractions, btnClients, btnEvenements, /*btnFactures, btnReservations,*/ btnReporting}) {
             btn.setPrefWidth(200);
             btn.setStyle("-fx-font-size: 14px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 10;");
         }
 
-        menuAdmin.getChildren().addAll(btnAttractions, btnClients, btnEvenements, btnFactures, btnReservations, btnReporting);
+        menuAdmin.getChildren().addAll(btnAttractions, btnClients, btnEvenements,/* btnFactures, btnReservations,*/ btnReporting);
         contentBox.getChildren().addAll(titre, emailLabel, roleLabel, menuAdmin);
 
         // Actions des boutons
@@ -141,6 +141,12 @@ public class VueAdmin {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+        });
+        btnHome.setOnAction(e -> {
+            VueAccueil vueAccueil = new VueAccueil (utilisateur); // Pas besoin de passer d’utilisateur
+            vueAccueil.afficher(new Stage());         // Affiche dans une nouvelle fenêtre
+            // Optionnel : stage.close(); // Si on veux fermer la page actuelle
+            stage.close();
         });
 
         navBar.getChildren().addAll(btnHome, btnCalendar, btnCart, btnUser);

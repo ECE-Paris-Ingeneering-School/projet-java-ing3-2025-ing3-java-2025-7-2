@@ -165,6 +165,7 @@ public class VueCalendrier {
             VueAccueil vueAccueil = new VueAccueil (utilisateurConnecte); // Pas besoin de passer d’utilisateur
             vueAccueil.afficher(new Stage());         // Affiche dans une nouvelle fenêtre
             // Optionnel : stage.close(); // Si tu veux fermer la page actuelle
+            stage.close();
         });
 
         // ===== Placement dans BorderPane =====
